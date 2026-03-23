@@ -1,1 +1,3045 @@
 
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SK Collection - Your Shirt Shop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* --- General Styles --- */
+        :root {
+            --primary-color: #333; /* Black */
+            --secondary-color: #f4f4f4;
+            --accent-color: #FFC300;
+            --white-color: #fff;
+            --dark-blue-button: #1A5276;
+            --border-radius: 5px;
+            --box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            --nav-width: 250px;
+            --delete-color: #e74c3c;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            line-height: 1.6;
+            background-color: var(--white-color);
+            color: var(--primary-color);
+            transition: margin-left .5s;
+            scroll-behavior: smooth;
+        }
+        
+        .sidenav-open {
+            margin-left: var(--nav-width);
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        button {
+            cursor: pointer;
+            border: none;
+            padding: 6px 10px; 
+            border-radius: 4px;
+            font-size: 0.85em;
+            transition: background-color 0.3s;
+        }
+
+        /* --- Header/Navbar (Sticky Header & Alignment) --- */
+        .header {
+            background-color: var(--white-color);
+            color: var(--primary-color);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        /* Container to align the logo, nav, and icons */
+        .header-content {
+            display: flex;
+            width: 100%;
+            justify-content: space-between; 
+            align-items: center;
+        }
+        
+        /* Logo (MOVED TO FAR LEFT) */
+        .logo {
+            position: static; 
+            transform: none;
+            z-index: 10; 
+            order: 1; 
+            /* NEW: Flex container for image/text logo */
+            display: flex;
+            align-items: center;
+        }
+
+        .logo h1 {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: var(--dark-blue-button);
+            /* Text appears to the right of the image */
+            margin-left: 5px; 
+            display: block; 
+        }
+        /* NEW: Logo Image Styling (INCREASED SIZE TO 60px) */
+        .logo-img {
+            height: 60px; /* Increased size */
+            width: 60px; /* Increased size */
+            object-fit: cover;
+            border-radius: 50%; /* Makes it circular */
+            margin-right: 5px; /* Adjust spacing */
+            border: 2px solid var(--dark-blue-button); /* Optional border */
+        }
+        
+        /* Navigation (CENTERED FIX) */
+        .nav-menu {
+            /* Ensures it takes necessary space to center content */
+            flex-grow: 1; 
+            display: flex;
+            justify-content: center; /* CRITICAL FIX: Centers the ul inside the nav */
+            order: 2; 
+        }
+        
+        .nav-menu ul {
+            list-style: none;
+            display: flex;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .nav-menu ul li a {
+            margin: 0 15px;
+            font-weight: 500;
+        }
+        
+        /* --- Dropdown Styles for Shop Categories (NEW/MODIFIED) --- */
+        .nav-dropdown {
+            position: relative;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: var(--white-color);
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+            top: 100%; 
+            border-radius: var(--border-radius);
+            padding: 5px 0;
+        }
+        .dropdown-content a {
+            color: var(--primary-color);
+            padding: 12px 16px;
+            text-decoration: none;
+            display: block;
+            text-align: left;
+            margin: 0;
+        }
+        .dropdown-content a:hover {
+            background-color: var(--secondary-color);
+            color: var(--dark-blue-button);
+        }
+        .nav-dropdown:hover .dropdown-content {
+            display: block;
+        }
+        /* End Dropdown Styles */
+
+
+        .hamburger-icon {
+            font-size: 1.5em;
+            margin-right: 15px;
+            cursor: pointer;
+            display: none;
+        }
+
+        /* Icons (Far Right) */
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            order: 3; 
+        }
+
+        .nav-icon {
+            margin-left: 20px;
+            font-size: 1.2em;
+            position: relative;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .icon-count {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            background-color: var(--delete-color);
+            color: var(--white-color);
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 0.7em;
+            min-width: 20px;
+            text-align: center;
+        }
+
+        /* Profile Icon State */
+        .user-name-display {
+            font-size: 1em;
+            font-weight: bold;
+            color: var(--primary-color);
+            cursor: pointer;
+        }
+
+        /* --- SIDE NAVIGATION BAR STYLING (NEW/UPDATED) --- */
+        .sidenav {
+            height: 100%;
+            width: 0;
+            position: fixed;
+            z-index: 1001;
+            top: 0;
+            left: 0;
+            background-color: var(--primary-color);
+            overflow-x: hidden;
+            padding-top: 60px;
+            transition: 0.5s;
+            box-shadow: 4px 0 8px rgba(0, 0, 0, 0.3);
+        }
+        .sidenav a {
+            padding: 10px 10px 10px 25px;
+            text-decoration: none;
+            font-size: 1.1em;
+            color: var(--secondary-color);
+            display: block;
+            transition: 0.3s;
+            border-bottom: 1px solid #444;
+        }
+        .sidenav a:hover {
+            color: var(--accent-color);
+            background-color: #444;
+        }
+        /* New styling for nested links in mobile nav */
+        .sidenav-nested {
+            padding-left: 45px !important;
+            font-size: 1em !important;
+            opacity: 0.8;
+            border-bottom: none;
+        }
+
+        .sidenav .close-btn {
+            position: absolute;
+            top: 0;
+            right: 25px;
+            font-size: 36px;
+            margin-left: 50px;
+            color: var(--secondary-color);
+        }
+        
+        /* Media Query: Ensures proper flow on smaller screens */
+        @media (max-width: 1000px) {
+            .nav-menu {
+                display: none;
+            }
+            .hamburger-icon {
+                display: block; 
+                order: 0;
+            }
+            .header-content {
+                /* Ensures hamburger is on the far left */
+                justify-content: flex-start;
+            }
+            .logo {
+                /* Moved the logo slightly right of the hamburger */
+                margin-left: 20px;
+            }
+            .logo h1 {
+                 font-size: 1.6em;
+            }
+            
+            /* MOBILE ICON MANAGEMENT: Grouping icons on the far right */
+            .nav-icons {
+                /* Push the entire icon group to the far right of the header */
+                margin-left: auto; 
+                order: 3;
+            }
+            
+            /* Ensure all key icons/profile link are visible on mobile */
+            .nav-icon#order-icon-container,
+            .nav-icon#wishlist-icon-container,
+            .nav-icon#cart-icon-container,
+            .nav-icon#profile-container { 
+                display: flex; /* Display as flex to align icon and text (Sign In) */
+                align-items: center;
+                margin-left: 10px; /* Adjust spacing between icons */
+            }
+            
+            /* Profile/Sign In text adjustment for smaller screens */
+            .user-name-display {
+                 display: none; /* Hide 'Sign In' text to save space on mobile, just show icon */
+            }
+            
+            /* For the Profile Icon in Sign In state, ensure the icon shows */
+            #profile-icon.hidden {
+                 display: block !important; 
+            }
+        }
+        /* End Header Specific CSS */
+
+
+        /* --- Banner Section (DYNAMIC AD) --- */
+        .banner {
+            background: var(--white-color);
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 0 5%;
+            overflow: hidden; 
+        }
+        .banner-image {
+            width: 100%;
+            max-height: 500px;
+            object-fit: cover;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: opacity 0.5s ease-in-out; 
+        }
+        .banner-content {
+            z-index: 10;
+            position: relative;
+        }
+        
+        /* --- SHOP CATEGORIES SECTION STYLING (MODIFIED WITH TREND ANIMATION) --- */
+        #shop-categories-section {
+            padding: 40px 5%;
+            background-color: var(--white-color);
+            text-align: center;
+            border-bottom: 1px solid #ddd;
+        }
+        #shop-categories-section h2 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+        #shop-categories-section p {
+            color: #555; 
+            max-width: 600px; 
+            margin: 0 auto 30px auto; 
+            font-size: 1em;
+        }
+
+        .category-grid {
+            /* Change to CSS Grid for better control */
+            display: grid;
+            /* Desktop: 4 equal columns */
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 20px;
+            max-width: 1200px; /* Optional: Constrain desktop width */
+            margin: 0 auto; /* Center the grid on desktop */
+        }
+        
+        .category-card {
+            width: 100%; /* Fill the grid column */
+            height: 250px; 
+            background-color: var(--secondary-color);
+            border: 1px solid #ccc;
+            border-radius: var(--border-radius);
+            display: flex;
+            flex-direction: column; 
+            justify-content: flex-start;
+            align-items: center;
+            font-size: 1.5em;
+            font-weight: 600;
+            color: var(--dark-blue-button);
+            transition: all 0.3s ease-out; /* All properties transition smoothly */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Soft initial shadow */
+            cursor: pointer; 
+            padding: 10px;
+            position: relative; /* Shine effect-க்காக தேவை */
+            overflow: hidden; /* Shine effect-ஐ கார்டுக்குள் கட்டுப்படுத்த */
+            z-index: 1; /* For stacking context with shine effect */
+        }
+        
+        /* HOVER EFFECT: Card lifts up and shadow deepens for a 3D effect */
+        .category-card:hover {
+            background-color: var(--white-color); /* Hover-ல் வெள்ளை நிறம் */
+            transform: translateY(-8px); /* Card lifts up */
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2); /* Deeper shadow on lift */
+        }
+        
+        /* NEW SHINE EFFECT: Pseudo-element for the animated highlight */
+        .category-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -75%; /* Start position: off the left */
+            width: 50%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.3); /* White translucent shine */
+            transform: skewX(-20deg); /* Skew for a slanted look */
+            transition: left 0.6s ease-in-out; 
+            pointer-events: none; /* Shine effect-ஆல் கிளிக் தடைபடாமல் இருக்க */
+            z-index: 10; /* Ensure shine is on top of the image */
+        }
+
+        /* HOVER SHINE EFFECT: Slide the shine element across the card */
+        .category-card:hover::before {
+            left: 120%; /* End position: Slide across to the right */
+        }
+        
+        /* MODIFIED: Style for the Category Image (Rectangle/Square) */
+        .category-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: var(--border-radius);
+            margin-bottom: 8px;
+            border: none; 
+            transition: all 0.3s ease-out;
+            filter: brightness(0.9); /* Initially slightly dimmer */
+            z-index: 5; /* Below the shine effect */
+        }
+        /* HOVER: Image brightens up slightly */
+        .category-card:hover img {
+            transform: scale(1.0);
+            filter: brightness(1.05);
+        }
+        /* Style for the nested text */
+        .category-card .card-text {
+            font-size: 1.2em;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-top: 0;
+            text-align: center;
+            transition: color 0.3s ease-out;
+            z-index: 5;
+        }
+        /* HOVER: Text color changes to dark blue */
+        .category-card:hover .card-text {
+            color: var(--dark-blue-button);
+        }
+
+        /* Tablet view: Change to 2 cards per row for medium screens */
+        @media (max-width: 768px) {
+            .category-grid {
+                grid-template-columns: repeat(2, 1fr); 
+            }
+            /* Cards need a smaller fixed width on mobile since the grid doesn't rely on it */
+            .category-card {
+                width: 100%; /* Fill the grid column */
+            }
+        }
+
+        /* Phone view: Adjust spacing and size for small screens */
+        @media (max-width: 480px) {
+            .category-grid {
+                /* CRITICAL FIX: Keep 2 columns on phones to prevent crowding */
+                grid-template-columns: repeat(2, 1fr); 
+                gap: 10px;
+            }
+            .category-card {
+                height: 220px; /* Adjust height for smaller screen space */
+            }
+            .category-card img {
+                 height: 150px;
+            }
+            .category-card .card-text {
+                 font-size: 1.1em;
+            }
+        }
+
+        /* --- Product Section Styling (MINIMIZED VIEW) --- */
+        .product-section {
+             /* MINIMIZED: Reduced vertical padding */
+             padding: 20px 5%;
+             min-height: 100px; 
+             text-align: center;
+             /* Ensure visibility of the section for filtering */
+             transition: opacity 0.3s ease-in-out;
+             margin-top: 0; /* Ensures minimal spacing between product sections */
+        }
+        /* CLASS TO HIDE SECTIONS FOR FILTERING */
+        .products-hidden {
+             display: none !important;
+             opacity: 0;
+        }
+        .shirts-placeholder-section {
+            background-color: var(--secondary-color);
+        }
+        .bottom-wear-section {
+            background-color: var(--white-color); 
+        }
+        /* Adjusted H2 margin for minimization */
+        .product-section h2 {
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            color: var(--primary-color); /* Common Black Text */
+            font-weight: 700;
+        }
+        /* Adjusted Custom Title margin for minimization */
+        .custom-section-title {
+            text-align:center;
+            background:#f8f8f8;
+            padding:15px 0;
+            border-radius:10px;
+            margin-bottom:15px;
+            border: 1px solid #ddd;
+        }
+        .custom-section-title h1 {
+            font-size: 1.8em;
+            font-weight:700; 
+            color: var(--primary-color); /* Common Black Text */
+            margin:0;
+        }
+
+        .product-grid {
+            display: grid;
+            /* Desktop view: 4 columns */
+            grid-template-columns: repeat(4, 1fr); 
+            gap: 15px; 
+            padding-top: 15px;
+            /* Default: Minimized view showing one row (4 cards on desktop) */
+            max-height: 350px; 
+            overflow: hidden; 
+            transition: max-height 0.5s ease-in-out; /* Smooth transition for expansion */
+        }
+        /* Class to remove max-height on expansion */
+        .product-grid.expanded {
+            max-height: none !important; /* Forces view of all content */
+            overflow: visible !important;
+        }
+        
+        /* Responsiveness for mobile view (2 CARDS PER ROW MAX VIEW) */
+        @media (max-width: 600px) {
+            .product-grid {
+                /* Phone view: 2 columns */
+                grid-template-columns: repeat(2, 1fr);
+                /* Limit to show 2 rows (4 cards total) */
+                max-height: 650px; /* Adjusted height for 2 rows of new-size cards */
+            }
+        }
+        @media (max-width: 400px) {
+             .product-grid {
+                /* Very small screens: 1 column */
+                grid-template-columns: 1fr;
+                 /* Limit to show 4 cards (4*250px + 4*15px gap) */
+                max-height: 1050px; 
+            }
+        }
+        /* Product Card Dimensions (DECREASED CARD SIZE) */
+        .product-card {
+            background: var(--white-color);
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            overflow: hidden;
+            box-shadow: var(--box-shadow);
+            transition: transform 0.3s, box-shadow 0.3s;
+            text-align: left;
+            height: 250px;
+            position: relative;
+        }
+        
+        /* --- Hover Visibility Controls (NEW/MODIFIED) --- */
+        
+        /* 1. Wishlist Icon: Hidden by default */
+        .wishlist-toggle {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            font-size: 1.5em;
+            color: #ccc;
+            cursor: pointer;
+            z-index: 10;
+            transition: color 0.2s, opacity 0.3s;
+            opacity: 0;
+        }
+        /* 1a. Wishlist Icon: Shown on hover */
+        .product-card:hover .wishlist-toggle {
+            opacity: 1; 
+        }
+        /* 1b. Wishlist Icon: Active state (always visible regardless of hover) */
+        .wishlist-toggle.active {
+            color: var(--delete-color);
+            opacity: 1;
+        }
+        .wishlist-toggle:hover {
+            color: var(--delete-color);
+        }
+
+        /* FIX: Ensure image fits without being cut off */
+        .product-card img {
+            width: 100%;
+            height: 150px;
+            object-fit: contain; /* FIXED: Ensure image fits without being cut */
+            display: block;
+            background-color: #fff;
+        }
+        
+        /* SLIDE UP ANIMATION FOR PRODUCT INFO (Desktop Only) */
+        .product-info {
+            padding: 5px 8px;
+            line-height: 1.2;
+            background-color: var(--white-color);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100px; /* Base height for the info area */
+            transform: translateY(45px); /* Hide half of the info initially */
+            transition: transform 0.3s ease-out; /* Smooth slide animation */
+            box-shadow: 0 -5px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .product-card:hover .product-info {
+            transform: translateY(0); /* Slide up completely on hover */
+        }
+        
+        .product-title {
+            font-size: 0.95em;
+            margin-bottom: 2px; 
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .product-price {
+            font-size: 0.85em;
+            margin-bottom: 5px; 
+            font-weight: bold;
+        }
+        .product-actions {
+            display: flex; 
+            gap: 5px; 
+            margin-top: 5px;
+        }
+        .btn-quick-view {
+            background-color: #000;
+            color: var(--white-color);
+            flex-grow: 1;
+            width: 100%;
+        }
+        .btn-quick-view:hover {
+            background-color: #333;
+        }
+        
+        .btn-add-to-cart {
+            background-color: var(--dark-blue-button); 
+            color: var(--white-color);
+            flex-grow: 1;
+            display: block; /* Always displayed in this card style */
+        }
+        
+        .product-card:hover .btn-quick-view {
+            width: auto;
+            flex-grow: 1;
+        }
+        .product-card:hover .btn-add-to-cart {
+            display: block;
+        }
+        /* End Hover Visibility Controls */
+
+        /* --- Product Card Mobile Adjustments (@media (max-width: 600px)) --- */
+        @media (max-width: 600px) {
+            .product-grid {
+                /* Phone view: 2 columns */
+                grid-template-columns: repeat(2, 1fr);
+                /* Limit to show 2 rows (4 cards total) */
+                max-height: 650px; /* Adjusted height for 2 rows of new-size cards */
+            }
+
+            /* Product Card Dimensions (ADJUSTED HEIGHT) */
+            .product-card {
+                /* CRITICAL FIX 1: Allow card height to be determined by content */
+                height: auto; 
+                min-height: 250px; /* Set a minimum height if needed */
+                position: static; /* Remove 'position: relative' to simplify layout */
+                padding-bottom: 5px; /* Add padding for bottom content */
+            }
+            
+            /* Image Size Adjustment */
+            .product-card img {
+                /* CRITICAL FIX 2: Ensure the image is visually appropriate on mobile */
+                height: 120px; /* Slightly reduced image height for better mobile fit */
+                object-fit: contain; 
+                width: 100%;
+            }
+
+            /* SLIDE UP ANIMATION REMOVAL / DETAILS VISIBILITY FIX */
+            .product-info {
+                position: static; /* CRITICAL FIX 3: Remove absolute positioning */
+                transform: translateY(0); /* CRITICAL FIX 4: Remove the slide-up transform */
+                height: auto; /* Allow height to fit content */
+                box-shadow: none; /* Remove subtle shadow */
+                padding: 5px 8px; /* Maintain padding */
+                /* Ensure layout is always visible, even without hover */
+                opacity: 1; 
+            }
+            
+            /* Remove hover effect since info is always visible */
+            .product-card:hover .product-info {
+                transform: translateY(0); /* Ensure hover doesn't re-introduce animation */
+            }
+            
+            /* Keep action buttons visible and stacked on mobile */
+            .product-actions {
+                flex-direction: column; /* Stack buttons vertically */
+                gap: 8px;
+                margin-top: 10px;
+            }
+            
+            .btn-quick-view, .btn-add-to-cart {
+                width: 100%;
+                padding: 8px;
+            }
+
+            /* Ensure wishlist icon is always visible on the card (optional for mobile) */
+            .wishlist-toggle {
+                opacity: 1; /* Always show the wishlist icon on mobile */
+                top: 5px;
+                right: 5px;
+                font-size: 1.2em;
+            }
+        }
+        /* --- END Product Card Mobile Adjustments --- */
+
+        
+        /* --- VIEW ALL BUTTON STYLES (NEW ANIMATION) --- */
+        .btn-view-all {
+            /* Base Styles (Black/White) */
+            background-color: #000 !important; 
+            color: var(--white-color) !important;
+            padding: 10px 20px !important;
+            font-size: 1em;
+            margin-top: 25px;
+            display: inline-block !important; /* Ensures pseudo-element containment */
+            width: 200px;
+            margin-left: auto;
+            margin-right: auto;
+            font-weight: 600;
+            border-radius: 4px;
+            border: 1px solid #000;
+            
+            /* Animation Setup */
+            position: relative; 
+            overflow: hidden; 
+            z-index: 1; 
+            transition: color 0.3s ease-in-out;
+        }
+
+        /* Pseudo-element for the blue color slide effect */
+        .btn-view-all::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%; /* Start off-screen to the left */
+            width: 100%;
+            height: 100%;
+            background-color: var(--dark-blue-button); /* Blue color for hover */
+            z-index: -1; /* Place behind the text */
+            transition: left 0.3s ease-in-out; /* Smooth slide animation */
+        }
+
+        /* Hover state: slide the blue background in */
+        .btn-view-all:hover::before {
+            left: 0; /* Slide in completely from the left */
+        }
+
+        /* Hover state: ensure the text remains visible and white */
+        .btn-view-all:hover {
+            color: var(--white-color) !important;
+        }
+        
+        /* --- Modal Styles (Quick View 500x500) --- */
+        .modal {
+            display: none; position: fixed; z-index: 2000; left: 0; top: 0;
+            width: 100%; height: 100%; overflow: auto; 
+            background-color: rgba(0,0,0,0.6); padding-top: 60px;
+        }
+        .modal-content {
+            background-color: var(--white-color); margin: 5% auto; padding: 30px;
+            border-radius: var(--border-radius); width: 90%; max-width: 600px;
+            box-shadow: var(--box-shadow); position: relative;
+        }
+        .modal-content.quick-view-modal {
+            max-width: 1100px; 
+            display: flex; 
+            gap: 30px; 
+            align-items: flex-start;
+        }
+        .modal-content.profile-modal-content {
+            max-width: 450px;
+            padding: 40px 30px;
+        }
+        .modal-quick-view-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            width: 500px;
+            min-width: 500px;
+        }
+        .modal-quick-view-img {
+            width: 500px; 
+            height: 500px;
+            background-color: var(--secondary-color);
+        }
+        .modal-quick-view-img img {
+            width: 100%; 
+            height: 100%;
+            object-fit: cover; 
+            border-radius: var(--border-radius);
+        }
+        .modal-thumbnails {
+            display: flex;
+            gap: 10px;
+            justify-content: space-between;
+        }
+        .modal-thumbnail-img {
+            width: 32%; 
+            height: 100px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border 0.2s;
+            overflow: hidden;
+            border-radius: 4px;
+        }
+        .modal-thumbnail-img:hover, .modal-thumbnail-img.active {
+            border-color: var(--dark-blue-button);
+        }
+        .modal-thumbnail-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .modal-quick-view-details {
+            flex-grow: 1;
+        }
+        .modal-btn-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .btn-buy-now {
+            background-color: #2ecc71;
+            color: var(--white-color);
+            flex-grow: 1;
+        }
+        .btn-buy-now:hover {
+            background-color: #27ae60;
+        }
+        .btn-modal-add-to-cart {
+             flex-grow: 1;
+             background-color: var(--dark-blue-button);
+             color: var(--white-color);
+        }
+        .btn-modal-add-to-cart:hover {
+             background-color: #0d3c5b;
+        }
+        .size-selector {
+            margin-bottom: 20px;
+            text-align: left;
+            padding: 10px; 
+            border: 1px solid var(--secondary-color); 
+            border-radius: var(--border-radius);
+        }
+        .size-selector label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .size-options button {
+            background-color: var(--white-color);
+            color: var(--primary-color);
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            margin-right: 5px;
+            font-weight: 500;
+        }
+        .size-options button:hover:not(.oos):not(.active) {
+            border-color: var(--dark-blue-button);
+        }
+        .size-options button.active {
+            background-color: var(--dark-blue-button);
+            color: var(--white-color);
+            border-color: var(--dark-blue-button);
+        }
+        .size-options button.oos {
+            text-decoration: line-through;
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: #eee;
+        }
+        .stock-status {
+            margin-top: 10px;
+            font-weight: 600;
+        }
+        .stock-status.in-stock {
+            color: #2ecc71; 
+        }
+        .stock-status.out-of-stock {
+            color: var(--delete-color); 
+        }
+        
+        .close-btn {
+            color: #aaa; float: right; font-size: 28px; font-weight: bold;
+            position: absolute; top: 10px; right: 20px; line-height: 1;
+            /* FIX: Add cursor pointer */
+            cursor: pointer;
+        }
+        .form-container {
+            border: 1px solid #ddd; border-radius: var(--border-radius);
+        }
+        .hidden {
+            display: none !important;
+        }
+
+        /* --- Mobile Adjustments for Quick View Modal (New Media Query) --- */
+        @media (max-width: 600px) {
+            
+            /* 1. Modal Content: Full screen and single column layout */
+            .modal-content.quick-view-modal {
+                /* Override desktop centering and size */
+                margin: 0;
+                width: 100%; 
+                max-width: none;
+                height: 100vh; /* Full height */
+                overflow-y: auto; /* Allow scrolling */
+                padding: 15px; /* Reduce padding */
+                
+                /* CRITICAL: Switch to vertical layout */
+                flex-direction: column; 
+                gap: 15px; /* Reduce gap */
+            }
+            
+            /* 2. Quick View Section: Remove fixed width and take up full space */
+            .modal-quick-view-section {
+                width: 100%; /* Take full width */
+                min-width: 100%; /* Ensure it spans the container */
+            }
+            
+            /* 3. Main Image Container: Remove fixed size and maintain aspect ratio */
+            .modal-quick-view-img {
+                width: 100%; /* Image container is full width */
+                /* Use padding-top trick for a responsive 1:1 aspect ratio */
+                height: 0; 
+                padding-top: 100%; 
+                position: relative; 
+                background-color: var(--secondary-color);
+            }
+            
+            /* 4. Main Image: Fill the responsive container */
+            .modal-quick-view-img img {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%; 
+                height: 100%; 
+                object-fit: contain; /* Ensure the image fits inside the box */
+            }
+
+            /* 5. Thumbnails: Adjust size and alignment */
+            .modal-thumbnails {
+                justify-content: flex-start; /* Align left */
+            }
+            .modal-thumbnail-img {
+                width: 80px; /* Set a fixed, smaller width */
+                height: 80px; /* Set a fixed, smaller height */
+                min-width: 80px;
+            }
+            
+            /* 6. Details Section: Adjust font size and ensure full width */
+            .modal-quick-view-details {
+                width: 100%;
+            }
+            #qv-title {
+                font-size: 1.5em !important;
+            }
+            #qv-price {
+                font-size: 1.2em !important;
+            }
+            
+            /* 7. Button Group: Use full width */
+            .modal-btn-group {
+                flex-direction: column; 
+            }
+            .modal-btn-group button {
+                width: 100%;
+            }
+        }
+        /* --- END Mobile Adjustments for Quick View Modal --- */
+
+
+        .checkout-modal {
+            padding: 20px; 
+            text-align: left;
+        }
+        .checkout-section {
+            margin-bottom: 30px;
+        }
+        .checkout-section h3, .checkout-section h4 {
+            padding-bottom: 5px;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        .checkout-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .checkout-grid-row-3 {
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .checkout-form-group input, .checkout-form-group select {
+            width: 100%;
+            padding: 12px 10px; 
+            border: 1px solid #ddd;
+            border-radius: 0; 
+            font-size: 1em;
+        }
+        .billing-option, .payment-option {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: flex-start;
+        }
+        .payment-option.selected, .billing-option.selected {
+             border-color: var(--dark-blue-button);
+        }
+        .payment-option input[type="radio"], .billing-option input[type="radio"] {
+            margin-right: 10px;
+            transform: scale(1.1); 
+            width: auto;
+            border: none;
+            padding: 0;
+            margin-top: 2px;
+        }
+        .payment-gateway-info {
+            padding-left: 30px; 
+            font-size: 0.8em;
+            color: #666;
+            margin-top: 5px;
+        }
+        .payment-gateway-icons {
+             margin-left: auto;
+        }
+        .shipping-method {
+            background: var(--secondary-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: left;
+            color: #555;
+            font-size: 0.9em;
+        }
+        .btn-pay-now {
+            background-color: var(--dark-blue-button);
+            color: var(--white-color);
+            width: 100%;
+            padding: 15px;
+            font-size: 1.1em;
+            border-radius: 0; 
+        }
+        .btn-pay-now:hover {
+            background-color: #0d3c5b;
+        }
+        
+        .cart-modal-content, .wishlist-modal-content {
+            max-width: 900px;
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            padding: 20px;
+        }
+        .cart-items-container {
+            flex-grow: 1;
+        }
+        .cart-summary {
+            min-width: 300px;
+            border-left: 1px solid #ddd;
+            padding-left: 20px;
+            position: sticky;
+            top: 20px;
+        }
+        .checkout-box {
+            background-color: var(--secondary-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+        }
+        /* Desktop/Default Styles for Summary Text */
+        .checkout-box p { 
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        .checkout-box .saved {
+            color: #2ecc71;
+            font-weight: bold;
+        }
+        
+        
+        .cart-item, .wishlist-item {
+            display: flex;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            align-items: center;
+        }
+        .cart-item-img, .wishlist-item-img {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: var(--border-radius);
+            margin-right: 15px;
+        }
+        .cart-item-details, .wishlist-item-details {
+            flex-grow: 1;
+        }
+        .cart-item-details h4, .wishlist-item-details h4 {
+            font-size: 1em;
+            margin-bottom: 5px;
+        }
+        .cart-item-details p, .wishlist-item-details p {
+            font-size: 0.9em;
+            color: #666;
+        }
+        .cart-quantity-control {
+            display: flex;
+            align-items: center;
+            margin-left: 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+        }
+        .cart-quantity-control button {
+            background: none;
+            border: none;
+            padding: 5px 10px;
+            font-size: 1.1em;
+        }
+        .cart-quantity-control input {
+            width: 30px;
+            text-align: center;
+            border: none;
+            border-left: 1px solid #ddd;
+            border-right: 1px solid #ddd;
+            height: 30px;
+            padding: 0;
+            margin: 0;
+            font-size: 1em;
+        }
+        .cart-item-price, .wishlist-item-actions {
+            width: 100px;
+            text-align: right;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+        .remove-btn {
+            color: var(--delete-color);
+            background: none;
+            font-size: 0.8em;
+            padding: 0;
+            margin-top: 5px;
+        }
+        
+        .payment-input-group {
+            margin-top: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+        
+        #cartModal, #wishlistModal {
+            background-color: var(--white-color);
+            padding-top: 0;
+        }
+        #cartModal .modal-content, #wishlistModal .modal-content {
+            margin: 0 auto;
+            width: 100%;
+            max-width: 1200px;
+            height: 100vh;
+            box-shadow: none;
+            border-radius: 0;
+            padding: 20px;
+        }
+        #cartModal .cart-modal-content, #wishlistModal .wishlist-modal-content {
+            height: calc(100vh - 40px);
+            flex-direction: row;
+            align-items: stretch;
+        }
+        /* --- Close Button Default Positioning --- */
+        #cartModal .close-btn, #wishlistModal .close-btn {
+            color: var(--primary-color); 
+            z-index: 2001; 
+            top: 20px; 
+            right: 40px;
+        }
+        .wishlist-item-actions button {
+            width: 100%;
+            margin-bottom: 10px;
+        }
+        
+        /* Mobile Adjustments for Cart/Wishlist - START CORRECTION (Updated) */
+        @media (max-width: 600px) {
+            
+            /* 1. மோடல் முழுத்திரையை நிரப்பவும், உருளவும் (Scroll) அனுமதிக்கும் */
+            #cartModal .modal-content, #wishlistModal .modal-content {
+                 /* Override desktop centering and size */
+                 margin: 0;
+                 width: 100%;
+                 max-width: none;
+                 height: 100vh; /* முழு உயரத்தை உறுதிப்படுத்துகிறது */
+                 overflow-y: auto; /* தேவைப்பட்டால் உள்ளடக்கத்தை உருட்டுகிறது */
+                 padding: 15px; /* பேடிங்கை குறைக்கிறது */
+            }
+
+            /* 2. உள்ளடக்கத்தை (Items and Summary) செங்குத்தாக அடுக்கி, முழு உயரத்தை நீக்குகிறது */
+            .cart-modal-content, .wishlist-modal-content {
+                flex-direction: column; 
+                height: auto; 
+                align-items: center; 
+                padding: 0;
+            }
+            
+            /* 3. கார்ட் சுருக்கத்தை (Summary) கீழே நகர்த்தி, முழு அகலத்தை கொடுக்கிறது */
+            .cart-summary {
+                order: 4; 
+                min-width: 100%; /* முழு அகலத்தை நிரப்புகிறது */
+                border-left: none;
+                border-top: 1px solid #ddd;
+                padding-top: 15px;
+                margin-top: 15px;
+                padding-left: 0;
+                position: static; /* sticky-யை நீக்குகிறது */
+            }
+            
+            .cart-items-container {
+                 width: 100%;
+            }
+
+            /* 4. கார்ட் ஐட்டம் (Item) வரிசைப்படுத்துதல் */
+            .cart-item {
+                flex-wrap: wrap;
+                justify-content: space-between;
+                align-items: flex-start;
+                padding-left: 0;
+                width: 100%; 
+            }
+            .cart-item-img {
+                margin-right: 10px;
+                /* Image and details take up the top row space */
+                order: 1; 
+            }
+            .cart-item-details {
+                /* ஐட்டம் விவரங்களுக்கு இடம் கொடுக்கிறது */
+                flex-grow: 1;
+                max-width: none; 
+                min-width: 120px; 
+                order: 1; /* Aligns next to the image on the top row */
+            }
+            
+            /* The image shows ₹500.00 directly under the Price details, not as a separate column.
+               I will adjust the pricing structure in cart-item-details to mimic this flow.
+               The final row will be Quantity control and a "Continue Shopping" button (if not removed). 
+            */
+            
+            .cart-quantity-control {
+                order: 3; 
+                /* Quantity Control-ஐ இடதுபுறத்தில், படத்தின் கீழ் அமைக்கவும் */
+                margin: 10px 0 0 0; 
+                min-width: 100px; /* அளவு கட்டுப்பாட்டுக்கு போதுமான இடம் */
+            }
+            
+            .cart-item-price {
+                /* CRITICAL FIX: The item total (₹500.00 in the image) should be displayed more clearly.
+                   Since the price is already detailed in .cart-item-details, and the provided
+                   image shows the TOTAL price on its own line below the details, 
+                   we will make this element full width and separate it visually, 
+                   placing it on the second row (order: 2).
+                */
+                order: 2; /* Moves price below the image/details row */
+                text-align: left; /* Aligns left */
+                font-size: 1.1em;
+                margin: 10px 0 0 0; /* Add top margin for separation */
+                width: 100%; /* Take full width of the container */
+                padding-top: 0; 
+                border-top: 1px dashed #eee;
+                padding-top: 10px;
+            }
+            
+            /* விலை விவரங்களை (Price/Remove) சரியாக அமைத்தல் */
+            .cart-item-details p {
+                line-height: 1.2;
+                margin-bottom: 2px;
+            }
+
+            .cart-item-details .remove-btn {
+                display: block;
+                margin-top: 5px; 
+                margin-bottom: 5px;
+                text-align: left; 
+            }
+            
+            /* --- CLOSE ICON FIX: மோடலுக்குள் இருந்த Close பட்டனைச் சரிசெய்தல் --- */
+            #cartModal .close-btn, #wishlistModal .close-btn {
+                right: 15px;
+                top: 15px;
+                color: var(--primary-color); /* கருப்பு நிறத்தில் தெளிவாகக் காட்டவும் */
+                font-size: 32px; /* சற்று பெரிதாகத் தெரிய */
+                z-index: 2005; /* எப்போதும் மற்ற உள்ளடக்கங்களுக்கு மேல் இருக்க */
+            }
+            .checkout-modal .modal-content {
+                margin: 20px auto;
+            }
+            
+            /* --- புதுப்பிக்கப்பட்ட Cart Summary CSS திருத்தம் (FINAL FIX for Amounts) --- */
+            .cart-summary .checkout-box p {
+                display: flex; 
+                justify-content: space-between; 
+                margin-bottom: 10px;
+                width: 100%;
+            }
+            /* இந்த ஸ்டைல், சுருக்கப் பகுதியில் உள்ள தொகைகள் ஒரு வரியில் சரியாக வருவதை உறுதி செய்கிறது. */
+            .cart-summary .checkout-box p span {
+                min-width: 80px; /* தொகைகளுக்கு குறைந்தபட்ச அகலம் */
+                text-align: right;
+            }
+
+            /* கூடுதல் தகவலை மொபைலுக்கு ஏற்றவாறு ஒழுங்கமைக்கவும் */
+            .cart-summary .checkout-box p:last-child {
+                font-size: 0.9em;
+                text-align: center;
+                display: block; 
+            }
+        }
+        /* Mobile Adjustments for Cart/Wishlist - END CORRECTION */
+
+        /* --- ABOUT US SECTION STYLES --- */
+        #about-us {
+            padding: 60px 5%;
+            background-color: var(--secondary-color);
+            text-align: center;
+        }
+        #about-us h2 {
+             font-size: 2.5em;
+             color: var(--primary-color);
+             margin-bottom: 25px;
+             font-weight: 700;
+             /* Title Animation Setup */
+             position: relative;
+             overflow: hidden;
+             display: inline-block;
+             padding: 0 5px;
+             z-index: 2;
+        }
+        #about-us h2::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background-color: var(--accent-color); /* Orange color */
+            z-index: -1;
+            transition: left 0.4s ease-out;
+        }
+        #about-us h2:hover::before {
+            left: 0;
+        }
+
+        #about-us p {
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            line-height: 1.8;
+            color: #555;
+            font-size: 1.1em;
+        }
+        /* New Styles for the Info Boxes (copied from screenshot) */
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+            max-width: 1200px;
+            margin: 40px auto 0;
+        }
+        .info-card {
+            background-color: var(--white-color);
+            padding: 25px;
+            border-radius: var(--border-radius);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            text-align: center;
+            border-top: 5px solid #87CEEB;
+            height: 100%;
+        }
+        .info-card .icon {
+            font-size: 2.5em;
+            color: var(--dark-blue-button);
+            margin-bottom: 15px;
+        }
+        .info-card h3 {
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+        }
+        .info-card p {
+            font-size: 0.9em;
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 15px;
+            max-width: none;
+        }
+        .info-card .counter-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            color: var(--dark-blue-button);
+            display: block;
+            margin-top: 15px;
+        }
+        .info-card .counter-label {
+            font-size: 0.9em;
+            color: #333;
+            display: block;
+            margin-top: 5px;
+        }
+        /* Mobile adjustment for info cards */
+        @media (max-width: 768px) {
+            .info-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+
+        /* --- FOOTER STYLING (NEW) --- */
+        .footer {
+            background-color: var(--primary-color);
+            color: var(--secondary-color);
+            padding: 40px 5%;
+            font-size: 0.95em;
+            line-height: 1.8;
+            border-top: 5px solid var(--accent-color);
+        }
+        .footer-content {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 40px;
+        }
+        .footer h3 {
+            color: var(--accent-color);
+            margin-bottom: 15px;
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+        .footer-logo p {
+            margin-top: 10px;
+            font-size: 0.85em;
+            opacity: 0.7;
+        }
+        .footer-links ul li a:hover {
+            color: var(--accent-color);
+        }
+        .social-icons a {
+            font-size: 1.5em;
+            margin-right: 15px;
+            transition: color 0.2s;
+        }
+        .social-icons a:hover {
+            color: var(--accent-color);
+        }
+        /* New store map link style */
+        .store-map-link {
+            display: flex;
+            align-items: center;
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .store-map-link i {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+        @media (max-width: 768px) {
+            .footer-content {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .form-toggle {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 25px;
+            border-radius: var(--border-radius);
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+        .form-toggle button {
+            flex-grow: 1;
+            padding: 12px 15px;
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            font-weight: 600;
+            border: none;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .form-toggle button.active {
+            background-color: var(--dark-blue-button);
+            color: var(--white-color);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-container {
+            padding: 20px;
+            border: none;
+            border-radius: var(--border-radius);
+            box-shadow: none;
+        }
+        .form-container h3 {
+            font-size: 1.5em;
+            color: var(--primary-color);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: var(--border-radius);
+            font-size: 1em;
+        }
+        
+        .form-submit-btn {
+            background-color: var(--dark-blue-button);
+            color: var(--white-color);
+            padding: 12px 20px;
+            font-size: 1.1em;
+            border-radius: var(--border-radius);
+        }
+        .form-submit-btn:hover {
+            background-color: #0d3c5b;
+        }
+
+        .profile-view-container {
+            background-color: var(--secondary-color);
+            padding: 25px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            text-align: left;
+        }
+        .profile-detail {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px dashed #ccc;
+        }
+        .profile-detail:last-of-type {
+            border-bottom: none;
+            margin-bottom: 20px;
+        }
+        .profile-detail span:first-child {
+            font-weight: 600;
+            color: var(--primary-color);
+        }
+        .profile-detail span:last-child {
+            color: #555;
+        }
+        .btn-logout {
+            background-color: var(--delete-color);
+            color: var(--white-color);
+            padding: 10px 20px;
+            font-size: 1em;
+            width: 100%;
+            margin-top: 10px;
+        }
+        .btn-logout:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="mySidenav" class="sidenav">
+        <a href="javascript:void(0)" class="close-btn" onclick="closeNav()">×</a>
+        <a href="#home" onclick="showHomePageView(); closeNav();">Home</a>
+        
+        <a href="#shop-categories-section" onclick="filterProductSection(null); closeNav();">Shop by Categories</a>
+        
+        <a href="#shirts" class="sidenav-nested" onclick="filterProductSection('shirts'); closeNav();">Shirts</a>
+        <a href="#pants" class="sidenav-nested" onclick="filterProductSection('pants'); closeNav();">Pants</a>
+        <a href="#shorts" class="sidenav-nested" onclick="filterProductSection('shorts'); closeNav();">Shorts</a>
+        <a href="#tshirts" class="sidenav-nested" onclick="filterProductSection('tshirts'); closeNav();">TShirts</a>
+        
+        <a href="#about-us" onclick="closeNav()">About Us</a>
+        <a href="#footer" onclick="closeNav()">Contact Us</a> 
+    </div>
+
+    <header class="header">
+        <div class="header-content">
+            
+            <div class="hamburger-icon" onclick="openNav()">
+                <i class="fas fa-bars"></i>
+            </div>
+            
+            <div class="logo" id="main-logo-container">
+                <h1 id="logo-text">SK COLLECTION</h1>
+            </div>
+            
+            <nav class="nav-menu">
+                <ul>
+                    <li><a href="#home" onclick="showHomePageView();">Home</a></li>
+                    
+                    <li class="nav-dropdown">
+                        <a href="#shop-categories-section" onclick="filterProductSection(null);">Shop by Categories <i class="fas fa-caret-down" style="margin-left: 5px;"></i></a>
+                        <div class="dropdown-content">
+                            <a href="#shirts" onclick="filterProductSection('shirts')">Shirts</a>
+                            <a href="#tshirts" onclick="filterProductSection('tshirts')">TShirts</a>
+                            <a href="#pants" onclick="filterProductSection('pants')">Pants</a>
+                            <a href="#shorts" onclick="filterProductSection('shorts')">Shorts</a>
+                        </div>
+                    </li>
+                    
+                    <li><a href="#about-us">About Us</a></li>
+                    <li><a href="#footer">Contact Us</a></li> 
+                </ul>
+            </nav>
+            
+            <div class="nav-icons">
+                <div class="nav-icon"><i class="fas fa-search"></i></div>
+                
+                <div id="profile-container" class="nav-icon" onclick="toggleProfileModal()">
+                    <i id="profile-icon" class="fas fa-user"></i>
+                    <span id="user-name-display" class="user-name-display">Sign In</span>
+                </div>
+
+                <div id="order-icon-container" class="nav-icon" onclick="alert('Order Tracking functionality pending.')">
+                    <i class="fas fa-box-open"></i> 
+                </div>
+
+                <div id="wishlist-icon-container" class="nav-icon" onclick="toggleWishlistModal()">
+                    <i class="fas fa-heart"></i>
+                    <span id="wishlist-count" class="icon-count">0</span>
+                </div>
+                <div id="cart-icon-container" class="nav-icon" onclick="toggleCartModal()">
+                    <i class="fas fa-shopping-cart"></i>
+                    <span id="cart-count" class="icon-count">0</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <section id="home" class="banner">
+        <div class="banner-content">
+             <p>Loading banner...</p>
+        </div>
+    </section>
+    
+    <section id="shop-categories-section">
+        <h2>Shop by Categories</h2>
+        
+        <div class="category-grid">
+            <a href="#shirts" class="category-card" onclick="filterProductSection('shirts');">
+                <img id="cat-img-shirts" src="https://via.placeholder.com/250x180/CCCCCC/666666?text=Category+Image" alt="Shirts Category Image">
+                <span class="card-text">Shirts</span>
+            </a>
+            <a href="#tshirts" class="category-card" onclick="filterProductSection('tshirts');">
+                <img id="cat-img-tshirts" src="https://via.placeholder.com/250x180/CCCCCC/666666?text=Category+Image" alt="T-Shirts Category Image">
+                <span class="card-text">T-Shirts</span>
+            </a>
+            <a href="#pants" class="category-card" onclick="filterProductSection('pants');">
+                <img id="cat-img-pants" src="https://via.placeholder.com/250x180/CCCCCC/666666?text=Category+Image" alt="Pants Category Image">
+                <span class="card-text">Pants</span>
+            </a>
+            <a href="#shorts" class="category-card" onclick="filterProductSection('shorts');">
+                <img id="cat-img-shorts" src="https://via.placeholder.com/250x180/CCCCCC/666666?text=Category+Image" alt="Shorts Category Image">
+                <span class="card-text">Shorts</span>
+            </a>
+        </div>
+    </section>
+
+    <section id="about-us">
+        <h2>About SK Collection</h2>
+        
+        <p>
+            SK Collection brings you the latest and most stylish trends in fashion, offering a wide range of shirts, t-shirts, shorts, pants, and shoes for every occasion. We focus on modern designs, premium quality, and unbeatable comfort to make sure you always look your best. Whether you want casual streetwear, everyday essentials, or bold trending outfits, SK Collection delivers fresh styles that match today’s fashion vibe. Shop with us and stay ahead in the trend game—your style, upgraded.
+        </p>
+
+        <div class="info-grid">
+            
+            <div class="info-card">
+                <i class="fas fa-check-circle icon"></i>
+                <h3>Premium Quality Fabrics</h3>
+                <p>We use only high-grade materials that feel soft, last long, and offer maximum comfort.</p>
+                <span class="counter-value" data-target="41000" data-suffix="k+">0</span>
+                <span class="counter-label">Happy Customer</span>
+            </div>
+            
+            <div class="info-card">
+                <i class="fas fa-tshirt icon"></i>
+                <h3>Stylish & Trendy Designs</h3>
+                <p>Stay ahead in fashion with our latest collections crafted to match your lifestyle.</p>
+                <span class="counter-value" data-target="500" data-suffix="+">0</span>
+                <span class="counter-label">Unique Collection</span>
+            </div>
+            
+            <div class="info-card">
+                <i class="fas fa-shipping-fast icon"></i>
+                <h3>Fast & Reliable Delivery</h3>
+                <p>Enjoy quick shipping and smooth service across Tamil Nadu and beyond.</p>
+                <span class="counter-value" data-target="48" data-suffix="">0</span>
+                <span class="counter-label">Delivers Within 48 hrs</span>
+            </div>
+            
+            <div class="info-card">
+                <i class="fas fa-undo-alt icon"></i>
+                <h3>Easy Exchange Available</h3>
+                <p>Not happy with the size or fit? No worries - we offer a simple and hassle-free exchange process.</p>
+                <span class="counter-value" data-target="100" data-suffix="+">0</span>
+                <span class="counter-label">Trusted Customers</span>
+            </div>
+            
+        </div>
+    </section>
+
+    <section id="shirts" class="product-section shirts-placeholder-section products-hidden">
+        <h2>Shirts Collection</h2>
+        <div id="shirts-grid" class="product-grid">
+            <p>Loading shirts...</p>
+        </div>
+        <div id="shirts-view-all-container"></div>
+    </section>
+    
+    <section id="pants" class="product-section bottom-wear-section products-hidden">
+        
+        <div class="custom-section-title">
+            <h1>
+                Pants Collection
+            </h1>
+        </div>
+
+        <div id="pants-grid" class="product-grid">
+            <p>Loading bottom wear...</p>
+        </div>
+        <div id="pants-view-all-container"></div>
+    </section>
+
+    <section id="shorts" class="product-section bottom-wear-section products-hidden">
+        
+        <div class="custom-section-title">
+            <h1>
+                Shorts Collection
+            </h1>
+        </div>
+
+        <div id="shorts-grid" class="product-grid">
+            <p>Loading shorts...</p>
+        </div>
+        <div id="shorts-view-all-container"></div>
+    </section>
+
+    <section id="tshirts" class="product-section shirts-placeholder-section products-hidden">
+        <h2>T-Shirts Collection</h2>
+        <div id="tshirts-grid" class="product-grid">
+            <p>Loading T-shirts...</p>
+        </div>
+        <div id="tshirts-view-all-container"></div>
+    </section>
+    
+    
+    <div id="profileModal" class="modal">
+        <div class="modal-content profile-modal-content">
+            <span class="close-btn" onclick="toggleProfileModal()">×</span>
+            <div id="formToggle" class="form-toggle">
+                <button id="signup-tab" class="active" onclick="showForm('signup')">Sign Up</button>
+                <button id="signin-tab" onclick="showForm('signin')">Sign In</button>
+            </div>
+            <div id="signupFormContainer" class="form-container">
+                <h3>Create an Account</h3>
+                <form id="signup-form">
+                    <div class="form-group"><label for="signup-name">Name</label><input type="text" id="signup-name" required></div>
+                    <div class="form-group"><label for="signup-email">Email</label><input type="email" id="signup-email" required></div>
+                    <div class="form-group"><label for="signup-password">Password</label><input type="password" id="signup-password" required></div>
+                    <div class="form-group"><label for="signup-repassword">Re-enter Password</label><input type="password" id="signup-repassword" required></div>
+                    <div class="form-group"><label for="signup-contact">Contact Number</label><input type="tel" id="signup-contact"></div>
+                    <button type="submit" class="form-submit-btn">Sign Up</button>
+                </form>
+            </div>
+            <div id="signinFormContainer" class="form-container hidden">
+                <h3>Welcome Back!</h3>
+                <form id="signin-form">
+                    <div class="form-group"><label for="signin-email">Email</label><input type="email" id="signin-email" required></div>
+                    <div class="form-group"><label for="signin-password">Password</label><input type="password" id="signin-password" required></div>
+                    <button type="submit" class="form-submit-btn">Sign In</button>
+                </form>
+            </div>
+            <div id="profileViewContainer" class="form-container hidden profile-view-container">
+                <h3>Your Profile Details</h3>
+                <div class="profile-detail"><span>Name:</span><span id="profile-name-display"></span></div>
+                <div class="profile-detail"><span>Email:</span><span id="profile-email-display"></span></div>
+                <div class="profile-detail"><span>Contact:</span><span id="profile-contact-display"></span></div>
+                <button id="logout-btn" class="btn-logout" onclick="signOutUser()">Log Out</button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="quickViewModal" class="modal">
+        <div class="modal-content quick-view-modal">
+            <span class="close-btn" onclick="toggleQuickViewModal()">×</span>
+            
+            <div class="modal-quick-view-section">
+                <div class="modal-quick-view-img">
+                    <img id="qv-image" src="" alt="Product Image"> 
+                </div>
+                
+                <div id="qv-thumbnails" class="modal-thumbnails">
+                    </div>
+            </div>
+            
+            <div id="qv-details" class="modal-quick-view-details">
+                <h3 id="qv-title" style="font-size: 2em; margin-bottom: 10px;">Product Title</h3>
+                <p id="qv-price" style="font-size: 1.5em; color: var(--dark-blue-button); margin-bottom: 20px; font-weight: bold;">$0.00</p>
+                
+                <div class="size-selector">
+                    <label>SIZE:</label>
+                    <div id="qv-size-options" class="size-options">
+                        </div>
+                    <div id="qv-stock-status" class="stock-status"></div>
+                </div>
+
+                <p id="qv-description" style="margin-bottom: 30px; line-height: 1.8;">Product Description goes here...</p>
+                
+                <div class="modal-btn-group">
+                    <button id="btn-buy-now" class="btn-buy-now">Buy Now</button>
+                    <button id="btn-modal-add-to-cart" class="btn-add-to-cart btn-modal-add-to-cart">Add to Cart</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="wishlistModal" class="modal">
+        <div class="modal-content wishlist-modal-content">
+            <span class="close-btn" onclick="toggleWishlistModal()">×</span>
+            
+            <div class="cart-items-container">
+                <h2 id="wishlist-title">Your Wishlist (0 Items)</h2>
+                
+                <div id="wishlist-items-list">
+                     <p>Your wishlist is empty.</p>
+                </div>
+                
+                <button class="action-btn" style="margin-top: 20px;" onclick="toggleWishlistModal()">Continue Shopping</button>
+            </div>
+
+            <div class="cart-summary" style="border-left: none;">
+                <h3 style="border-bottom: 1px solid #ddd; padding-bottom: 10px; margin-bottom: 15px;">Wishlist Actions</h3>
+                <p style="font-size: 0.9em; color: #555;">Move items to cart or monitor price changes here.</p>
+                
+                <button class="btn-buy-now" style="width: 100%; margin-top: 20px;" onclick="alert('Move all to cart functionality pending.')">Move All to Cart</button>
+            </div>
+        </div>
+    </div>
+    <div id="cartModal" class="modal">
+        <div class="modal-content cart-modal-content">
+            <span class="close-btn" onclick="toggleCartModal()">×</span>
+            
+            <div class="cart-items-container">
+                <h2 id="cart-title">Your Shopping Cart (0 Items)</h2>
+                
+                <div id="cart-items-list">
+                     <p>Your cart is empty.</p>
+                </div>
+                
+                <button class="action-btn" style="margin-top: 20px;" onclick="toggleCartModal(); toggleCheckoutModal();">Continue Shopping</button>
+            </div>
+
+            <div class="cart-summary">
+                <h3 id="summary-title">Subtotal (0 items)</h3>
+                <div class="checkout-box">
+                    <p style="font-weight: bold;">Subtotal: ₹<span id="summary-subtotal">0.00</span></p>
+                    <p class="saved">You have saved ₹<span id="summary-saved">0.00</span></p>
+                    <p style="font-size: 0.9em; color: #555;">Shipping and taxes will be calculated at checkout</p>
+                    <button class="btn-pay-now" style="margin: 10px 0 0 0;" onclick="toggleCartModal(); openCheckoutModal('DUMMY_ID', 'DUMMY_SIZE')">Checkout</button>
+                    <button class="action-btn" style="width: 100%; background: #999; margin-top: 10px;" onclick="toggleCartModal()">Continue Shopping</button>
+                </div>
+            </div>
+            </div>
+    </div>
+    <div id="checkoutModal" class="modal">
+        <div class="modal-content checkout-modal">
+            <span class="close-btn" onclick="toggleCheckoutModal()">×</span>
+            
+            <form id="checkout-form" onsubmit="event.preventDefault(); nextCheckoutStep()">
+                
+                <div class="checkout-section">
+                    <h3>Delivery</h3>
+                    <h4>Country/Region</h4>
+                    <div class="checkout-form-group">
+                         <select id="checkout-country">
+                             <option>India</option>
+                         </select>
+                    </div>
+
+                    <div class="checkout-form-group full-width">
+                        <input type="text" id="checkout-name" placeholder="Name" required>
+                    </div>
+                    
+                    <div class="checkout-form-group full-width">
+                        <input type="text" id="checkout-address" placeholder="Address" required>
+                    </div>
+                    <div class="checkout-form-group full-width">
+                        <input type="text" id="checkout-apartment" placeholder="Apartment, suite, etc. (optional)">
+                    </div>
+
+                    <div class="checkout-grid checkout-grid-row-3">
+                        <div class="checkout-form-group">
+                            <input type="text" id="checkout-city" placeholder="City" required>
+                        </div>
+                        <div class="checkout-form-group">
+                            <select id="checkout-state">
+                                <option value="Tamil Nadu">Tamil Nadu</option>
+                                <option value="Kerala">Kerala</option>
+                                </select>
+                        </div>
+                        <div class="checkout-form-group">
+                            <input type="text" id="checkout-zip" placeholder="PIN code" required>
+                        </div>
+                    </div>
+                    
+                    <div class="checkout-form-group full-width">
+                        <input type="tel" id="checkout-phone" placeholder="Phone" required>
+                    </div>
+                    
+                    </div>
+
+                <div class="checkout-section">
+                    <h3>Shipping method</h3>
+                    <div class="shipping-method">
+                        Enter your shipping address to view available shipping methods.
+                    </div>
+                </div>
+
+                <div class="checkout-section">
+                    <h3>Payment</h3>
+                    <h4 style="font-weight: normal;">All transactions are secure and encrypted.</h4>
+                    
+                    <div class="billing-option selected" id="upiOption">
+                        <input type="radio" name="payment-method" id="upi-pay" checked onchange="togglePaymentDetails('upi')">
+                        <label for="upi-pay">Google Pay / PhonePe / UPI ID</label>
+                        <div class="payment-gateway-info" id="upiDetails">
+                            <p>Pay instantly using your preferred UPI app or enter your UPI ID.</p>
+                            <div class="payment-input-group">
+                                <input type="text" placeholder="Enter UPI ID (e.g., mobile@vpa)">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="billing-option" id="cardsOption">
+                        <input type="radio" name="payment-method" id="cards-pay" onchange="togglePaymentDetails('cards')">
+                        <label for="cards-pay">Credit / Debit Card</label>
+                        <div class="payment-gateway-info hidden" id="cardsDetails">
+                            <p>Pay using Visa, Mastercard, Rupay, etc.</p>
+                            <div class="payment-input-group">
+                                <input type="text" placeholder="Card Number" style="margin-bottom: 5px;">
+                                <div class="checkout-grid">
+                                    <input type="text" placeholder="MM/YY">
+                                    <input type="text" placeholder="CVV">
+                                </div>
+                                <input type="text" placeholder="Name on Card">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h3>Billing address</h3>
+                    <div class="billing-option selected">
+                        <input type="radio" name="billing-address" id="same-as-shipping" checked>
+                        <label for="same-as-shipping">Same as shipping address</label>
+                    </div>
+                     <div class="billing-option">
+                        <input type="radio" name="billing-address" id="different-billing">
+                        <label for="different-billing">Use a different billing address</label>
+                    </div>
+                    
+                </div>
+                
+                <button type="submit" class="btn-pay-now">Pay now</button>
+            </form>
+        </div>
+    </div>
+
+    <footer id="footer" class="footer">
+        <div class="footer-content">
+            <div class="footer-logo">
+                <h3>SK COLLECTION</h3>
+                <p>© 2025 SK Collection. All rights reserved.</p>
+                <p class="footer-location">Location: 64/2 SK COLLECTION SATTUR, Sattur 626203</p> </div>
+            
+            <div class="footer-links">
+                <h3>CATEGORIES</h3>
+                <ul>
+                    <li><a href="#shirts">Shirts</a></li>
+                    <li><a href="#pants">Pants</a></li>
+                    <li><a href="#shorts">Shorts</a></li>
+                    <li><a href="#tshirts">TShirts</a></li>
+                </ul>
+            </div>
+
+            <div class="footer-contact">
+                <h3>CONTACT US</h3>
+                <p>Email: skcollectionsattur@gmail.com</p>
+                <p>Phone: +91 8608109013</p>
+                
+                <a href="javascript:void(0)" onclick="openStoreLocation()" class="store-map-link">
+                    <i class="fas fa-map-marker-alt"></i> Our Store
+                </a>
+                
+                <div class="social-icons" style="margin-top: 15px;">
+                    <a href="https://www.instagram.com/skcollectionsattur" target="_blank" title="Instagram"><i class="fab fa-instagram"></i></a>
+                    <a href="https://www.facebook.com/share/1ZUyGckzdM/" target="_blank" title="Facebook"><i class="fab fa-facebook-f"></i></a> <a href="https://wa.me/918608109013" target="_blank" title="WhatsApp"><i class="fab fa-whatsapp"></i></a> <a href="https://www.twitter.com" target="_blank" title="Twitter"><i class="fab fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAH_9T5ACVJpzqRLF3DRFrrNT8XSrplEI4",
+            authDomain: "skcollection-96f9a.firebaseapp.com",
+            databaseURL: "https://skcollection-96f9a-default-rtdb.firebaseio.com",
+            projectId: "skcollection-96f9a",
+            storageBucket: "skcollection-96f9a.firebasestorage.app",
+            messagingSenderId: "52946896548",
+            appId: "1:52946896548:web:d03321527e7fa449b18831",
+            measurementId: "G-9H3FVEHZN8"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const database = firebase.database();
+        
+        const profileModal = document.getElementById('profileModal');
+        const quickViewModal = document.getElementById('quickViewModal');
+        const checkoutModal = document.getElementById('checkoutModal');
+        const cartModal = document.getElementById('cartModal'); 
+        const wishlistModal = document.getElementById('wishlistModal'); 
+        const qvImage = document.getElementById('qv-image');
+        const qvThumbnailsContainer = document.getElementById('qv-thumbnails');
+        const shirtsGrid = document.getElementById('shirts-grid');
+        const pantsGrid = document.getElementById('pants-grid');
+        const tshirtsGrid = document.getElementById('tshirts-grid'); 
+        const homeSection = document.getElementById('home');
+        
+        const shortsGrid = document.getElementById('shorts-grid');
+        const shortsViewAllContainer = document.getElementById('shorts-view-all-container');
+        
+        const wishlistCountDisplay = document.getElementById('wishlist-count');
+        const cartCountDisplay = document.getElementById('cart-count');
+        const cartItemsList = document.getElementById('cart-items-list');
+        const cartTitle = document.getElementById('cart-title');
+        const summaryTitle = document.getElementById('summary-title');
+        const summarySubtotal = document.getElementById('summary-subtotal');
+        const summarySaved = document.getElementById('summary-saved');
+        const wishlistItemsList = document.getElementById('wishlist-items-list');
+        const wishlistTitle = document.getElementById('wishlist-title');
+
+        const shirtsViewAllContainer = document.getElementById('shirts-view-all-container');
+        const pantsViewAllContainer = document.getElementById('pants-view-all-container');
+        const tshirtsViewAllContainer = document.getElementById('tshirts-view-all-container');
+        
+        // NEW Logo Elements
+        const mainLogoContainer = document.getElementById('main-logo-container');
+        const logoText = document.querySelector('#main-logo-container h1');
+
+
+        let currentProductInventory = {};
+        let allProductsCache = {}; 
+        let userWishlist = {}; 
+        let currentAdUrls = []; 
+        let currentAdIndex = 0; 
+        let bannerInterval;
+        let countersInitialized = false;
+
+        // --- NEW MAP FUNCTION ---
+        window.openStoreLocation = function() {
+            const address = "64/2 SK COLLECTION SATTUR, Sattur 626203";
+            // Uses Google Maps to search for the address
+            window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(address)}`, '_blank');
+        }
+
+        // --- FILTERING FUNCTION ---
+        window.filterProductSection = function(targetId) {
+            const allSections = ['shirts', 'pants', 'shorts', 'tshirts'];
+            
+            allSections.forEach(id => {
+                const section = document.getElementById(id);
+                if (section) {
+                    // Check if the section is the target, or if the target is null (meaning show all main sections)
+                    if (id === targetId) {
+                        section.classList.remove('products-hidden');
+                        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    } else if (targetId === null) {
+                        // If null/show all, keep main sections visible (default behavior on load/category click)
+                        section.classList.remove('products-hidden');
+                    } else {
+                        // Hide other sections if a specific category is selected
+                        section.classList.add('products-hidden');
+                    }
+                }
+            });
+        }
+        
+        // --- View All Expansion Function (UPDATED) ---
+        window.expandProductView = function(sectionId) {
+            const grid = document.getElementById(`${sectionId}-grid`);
+            const container = document.getElementById(`${sectionId}-view-all-container`);
+
+            if (grid) {
+                // Add the 'expanded' class to remove max-height/overflow
+                grid.classList.add('expanded');
+            }
+            if (container) {
+                // Hide the "View All" button after clicking it
+                container.style.display = 'none'; 
+            }
+            
+            // Scroll to the top of the expanded section
+            const section = document.getElementById(sectionId);
+            if (section) {
+                 section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        // --- NEW HOME VIEW FUNCTION (Ensures only Home/Categories/About Us are visible) ---
+        window.showHomePageView = function() {
+            const allSections = ['shirts', 'pants', 'shorts', 'tshirts'];
+            
+            // Hide all product sections
+            allSections.forEach(id => {
+                const section = document.getElementById(id);
+                if (section) {
+                    section.classList.add('products-hidden');
+                }
+            });
+            
+            // Scroll to the Home/Banner section
+            document.getElementById('home').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+
+        // --- Load/Close Functions ---
+        function openNav() {
+            document.getElementById("mySidenav").style.width = "var(--nav-width)";
+            document.body.classList.add('sidenav-open');
+        }
+
+        function closeNav() {
+            document.getElementById("mySidenav").style.width = "0";
+            document.body.classList.remove('sidenav-open');
+        }
+
+        // --- NEW Logo Display Function ---
+        async function loadAndDisplayLogo() {
+             // Fallback URL provided by the user
+             const defaultLogoUrl = 'https://i.postimg.cc/Jhj0FBjr/Screenshot-2025-11-20-195519.png'; 
+             try {
+                const snapshot = await database.ref('config/logo_url').once('value');
+                const logoUrl = snapshot.val();
+                
+                if (logoUrl || defaultLogoUrl) {
+                    const finalUrl = logoUrl || defaultLogoUrl;
+                    // Create an image element
+                    const img = document.createElement('img');
+                    img.src = finalUrl;
+                    img.alt = "SK Collection Logo";
+                    img.classList.add('logo-img'); // Applies the circular style and size
+                    
+                    // Prepend the image to the logo container
+                    mainLogoContainer.prepend(img);
+                    
+                    // Ensure the text logo remains visible
+                    logoText.style.display = 'block'; 
+                }
+             } catch (error) {
+                 console.error("Error loading logo URL:", error);
+                 // Fallback to text logo
+                 logoText.style.display = 'block';
+             }
+        }
+        
+        // --- NEW Category Image Loading Function ---
+        async function loadCategoryImages() {
+            // Default placeholder image URL (Rectangular)
+            const defaultPlaceholder = 'https://via.placeholder.com/250x180/CCCCCC/666666?text=Category+Image'; 
+            try {
+                // Fetch current URLs from Firebase, assuming they are under config/category_images
+                const snapshot = await database.ref('config/category_images').once('value');
+                const urls = snapshot.val() || {};
+                
+                // 1. Shirts
+                const shirtsImg = document.getElementById('cat-img-shirts');
+                if (shirtsImg) {
+                    shirtsImg.src = urls.shirts_url || defaultPlaceholder; 
+                }
+                
+                // 2. T-Shirts
+                const tshirtsImg = document.getElementById('cat-img-tshirts');
+                if (tshirtsImg) {
+                    tshirtsImg.src = urls.tshirts_url || defaultPlaceholder;
+                }
+                
+                // 3. Pants
+                const pantsImg = document.getElementById('cat-img-pants');
+                if (pantsImg) {
+                    pantsImg.src = urls.pants_url || defaultPlaceholder;
+                }
+                
+                // 4. Shorts
+                const shortsImg = document.getElementById('cat-img-shorts');
+                if (shortsImg) {
+                    shortsImg.src = urls.shorts_url || defaultPlaceholder;
+                }
+                
+            } catch (error) {
+                console.error("Error loading category images:", error);
+            }
+        }
+
+
+        async function loadAdBanner() {
+            if (bannerInterval) clearInterval(bannerInterval); 
+
+            try {
+                const snapshot = await database.ref('config/ads').once('value');
+                const ads = snapshot.val() || {};
+                
+                currentAdUrls = [];
+                if (ads.ad1_url && ads.ad1_url.startsWith('http')) currentAdUrls.push(ads.ad1_url);
+                if (ads.ad2_url && ads.ad2_url.startsWith('http')) currentAdUrls.push(ads.ad2_url);
+                
+                if (currentAdUrls.length > 0) {
+                    homeSection.innerHTML = `<img id="main-banner-img" src="${currentAdUrls[0]}" alt="Live Promotional Banner" class="banner-image">`;
+                    currentAdIndex = 0;
+                    startBannerRotation();
+                } else {
+                    homeSection.innerHTML = `
+                        <div class="banner-content">
+                            <h2 style="color: white;">🔥 Limited Time Offer! 🔥</h2>
+                            <p style="color: white;">Grab 30% off on our entire collection. Use code: DUSTED30 at checkout.</p>
+                        </div>
+                    `;
+                    homeSection.style.backgroundImage = "url('https://via.placeholder.com/1500x500/87CEEB/fff?text=SK+COLLECTION+AD+BANNER')";
+                    homeSection.style.backgroundRepeat = "no-repeat";
+                    homeSection.style.backgroundSize = "cover";
+                    homeSection.style.color = "white"; 
+                }
+
+            } catch (error) {
+                console.error("Error loading ad banner:", error);
+                homeSection.innerHTML = `<div class="banner-content"><h2 style="color:red;">Error Loading Ad</h2><p>Check console for details.</p></div>`;
+            }
+        }
+        
+        function startBannerRotation() {
+            if (currentAdUrls.length < 2) return; 
+
+            bannerInterval = setInterval(() => {
+                const imgElement = document.getElementById('main-banner-img');
+                if (!imgElement) return;
+
+                currentAdIndex = (currentAdIndex + 1) % currentAdUrls.length;
+                const nextUrl = currentAdUrls[currentAdIndex];
+
+                imgElement.style.opacity = 0;
+                setTimeout(() => {
+                    imgElement.src = nextUrl;
+                    imgElement.style.opacity = 1;
+                }, 500);
+            }, 3000);
+        }
+
+        const hoverIntervals = {};
+        
+        // Product card animation logic (removed image swipe)
+        function startHoverRotation(productId, imageElement) {
+            // Function logic remains but is no longer attached to HTML events
+        }
+
+        function stopHoverRotation(productId, imageElement) {
+            // Function logic remains but is no longer attached to HTML events
+        }
+
+        function generateProductCardHTML(product) {
+            const mainImage = product.images && product.images.length > 0 ? product.images[0] : 'https://via.placeholder.com/400x400?text=No+Image';
+            const isWishlisted = userWishlist[product.id] ? ' active' : '';
+
+            // Animation removed from hoverEvents
+            let hoverEvents = '';
+
+            return `
+                <div class="product-card" ${hoverEvents}>
+                    <i class="fas fa-heart wishlist-toggle${isWishlisted}" 
+                       data-product-id="${product.id}"
+                       onclick="toggleWishlist('${product.id}')"></i>
+                    <img src="${mainImage}" alt="${product.name}" class="product-img">
+                    <div class="product-info">
+                        <h3 class="product-title">${product.name}</h3>
+                        <p class="product-price">₹ ${product.price}</p>
+                        <div class="product-actions">
+                            <button class="btn-quick-view" onclick="openQuickViewModal('${product.id}')">Quick View</button> 
+                            <button class="btn-add-to-cart" onclick="addToCart('${product.id}')">Add to Cart</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function refreshProductGrid() {
+            
+            let shirtsHtml = '';
+            let pantsHtml = '';
+            let shortsHtml = '';
+            let tshirtsHtml = '';
+            
+            // Get products and sort by created_at (descending for newest first)
+            const allProducts = Object.values(allProductsCache);
+            allProducts.sort((a, b) => {
+                const dateA = new Date(a.created_at || '1970-01-01');
+                const dateB = new Date(b.created_at || '1970-01-01');
+                return dateB - dateA; // Newest first
+            });
+
+            const allShirts = allProducts.filter(p => p.category && (p.category.toLowerCase() === 'casual' || p.category.toLowerCase() === 'formal' || p.category.toLowerCase() === 'printed'));
+            const allPants = allProducts.filter(p => p.category && (p.category.toLowerCase() === 'pants' || (p.category.toLowerCase() === 'bottom wear' && !p.name.toLowerCase().includes('short'))));
+            const allShorts = allProducts.filter(p => p.category && (p.category.toLowerCase().includes('short') || (p.category.toLowerCase().includes('bottom wear') && p.name.toLowerCase().includes('short'))));
+            const allTshirts = allProducts.filter(p => p.category && p.category.toLowerCase() === 't-shirt');
+
+            const sectionsData = [
+                { id: 'shirts', count: allShirts.length, products: allShirts, container: shirtsViewAllContainer, grid: shirtsGrid, categoryName: 'Shirts' },
+                { id: 'pants', count: allPants.length, products: allPants, container: pantsViewAllContainer, grid: pantsGrid, categoryName: 'Pants' },
+                { id: 'shorts', count: allShorts.length, products: allShorts, container: shortsViewAllContainer, grid: shortsGrid, categoryName: 'Shorts' },
+                { id: 'tshirts', count: allTshirts.length, products: allTshirts, container: tshirtsViewAllContainer, grid: tshirtsGrid, categoryName: 'T-Shirts' },
+            ];
+
+            sectionsData.forEach(section => {
+                let sectionHtml = '';
+                section.products.forEach(product => {
+                    sectionHtml += generateProductCardHTML(product);
+                });
+                
+                // 1. Render all product cards into the grid
+                section.grid.innerHTML = sectionHtml || `<p>No ${section.categoryName.toLowerCase()} found.</p>`;
+                
+                // 2. Set the initial visibility (minimized state)
+                if (section.count > 4) {
+                    // Always render the grid minimized initially if count > 4
+                    section.grid.classList.remove('expanded'); 
+                    section.container.style.display = 'block';
+                    section.container.innerHTML = `<button class="action-btn btn-view-all" onclick="expandProductView('${section.id}')">View All ${section.categoryName}</button>`;
+                } else {
+                    // Show all products if count <= 4
+                    section.grid.classList.add('expanded');
+                    section.container.style.display = 'none';
+                }
+            });
+
+        }
+
+
+        function loadAndRenderAllProducts(skipCacheUpdate = false) {
+            if (!skipCacheUpdate) {
+                shirtsGrid.innerHTML = '<p>Loading shirts...</p>';
+                pantsGrid.innerHTML = '<p>Loading bottom wear...</p>';
+                shortsGrid.innerHTML = '<p>Loading shorts...</p>';
+                tshirtsGrid.innerHTML = '<p>Loading T-shirts...</p>';
+            }
+
+            database.ref('products').once('value')
+                .then(snapshot => {
+                    const productsData = snapshot.val();
+                    allProductsCache = productsData || {}; 
+                    
+                    refreshProductGrid();
+
+                })
+                .catch(error => {
+                    console.error("Error loading products:", error);
+                    shirtsGrid.innerHTML = '<p style="color:red;">Failed to load shirts. Check Firebase connection/rules.</p>';
+                    pantsGrid.innerHTML = '<p style="color:red;">Failed to load bottom wear. Check Firebase connection/rules.</p>';
+                    shortsGrid.innerHTML = '<p style="color:red;">Failed to load shorts. Check Firebase connection/rules.</p>';
+                    tshirtsGrid.innerHTML = '<p style="color:red;">Failed to load T-shirts. Check Firebase connection/rules.</p>';
+                });
+        }
+        
+        window.changeQuickViewImage = function(imageUrl, clickedElement) {
+            qvImage.src = imageUrl;
+
+            document.querySelectorAll('.modal-thumbnail-img').forEach(thumb => {
+                thumb.classList.remove('active');
+            });
+            clickedElement.classList.add('active');
+        }
+
+        const sizeMapping = { 'S': 'S', 'M': 'M-(28-30)', 'L': 'L-32', 'XL': 'XL-34', 'XXL': 'XXL-36' };
+        
+        function updateStockDisplay(sizeKey) {
+            const stockStatus = document.getElementById('qv-stock-status');
+            const qty = currentProductInventory[sizeKey] || 0;
+            
+            stockStatus.classList.remove('in-stock', 'out-of-stock');
+
+            if (qty > 0) {
+                stockStatus.textContent = `In stock (${qty} available)`;
+                stockStatus.classList.add('in-stock');
+                document.getElementById('btn-buy-now').disabled = false;
+                document.getElementById('btn-modal-add-to-cart').disabled = false;
+            } else {
+                stockStatus.textContent = `Out of stock`;
+                stockStatus.classList.add('out-of-stock');
+                document.getElementById('btn-buy-now').disabled = true;
+                document.getElementById('btn-modal-add-to-cart').disabled = true;
+            }
+        }
+        
+        function handleSizeSelection(sizeKey, buttonElement) {
+            document.querySelectorAll('#qv-size-options button').forEach(btn => btn.classList.remove('active'));
+            
+            buttonElement.classList.add('active');
+            
+            updateStockDisplay(sizeKey);
+            
+            const productId = buttonElement.closest('.modal-content').querySelector('#qv-title').dataset.productId;
+            document.getElementById('btn-modal-add-to-cart').setAttribute('onclick', `addToCart('${productId}', '${sizeKey}')`);
+            document.getElementById('btn-buy-now').setAttribute('onclick', `openCheckoutModal('${productId}', '${sizeKey}')`);
+        }
+
+        async function openQuickViewModal(productId) {
+            document.getElementById('qv-title').textContent = 'Loading...';
+            document.getElementById('qv-price').textContent = '';
+            document.getElementById('qv-description').textContent = '';
+            qvImage.src = 'https://via.placeholder.com/500x500?text=Loading';
+            qvThumbnailsContainer.innerHTML = ''; 
+            document.getElementById('qv-size-options').innerHTML = ''; 
+            document.getElementById('qv-stock-status').textContent = '';
+
+            quickViewModal.style.display = 'block';
+
+            try {
+                const product = allProductsCache[productId];
+
+                if (!product) {
+                    alert("Product not found! Ensure product data is loaded.");
+                    quickViewModal.style.display = 'none'; 
+                    return;
+                }
+
+                currentProductInventory = product.inventory || {};
+                const images = product.images || [];
+                let thumbnailHtml = '';
+
+                if (images.length > 0) {
+                    qvImage.src = images[0];
+                    
+                    images.slice(0, 3).forEach((url, index) => { 
+                        const isActive = index === 0 ? ' active' : '';
+                        thumbnailHtml += `
+                            <div class="modal-thumbnail-img${isActive}" onclick="changeQuickViewImage('${url}', this)">
+                                <img src="${url}" alt="Thumbnail ${index + 1}">
+                            </div>
+                        `;
+                    });
+                } else {
+                    qvImage.src = 'https://via.placeholder.com/500x500?text=No+Image';
+                }
+                qvThumbnailsContainer.innerHTML = thumbnailHtml;
+
+                document.getElementById('qv-title').textContent = product.name;
+                document.getElementById('qv-title').dataset.productId = product.id; 
+                document.getElementById('qv-price').textContent = `₹ ${product.price}`;
+                document.getElementById('qv-description').textContent = product.description;
+                
+                let sizeButtonsHtml = '';
+                const availableSizes = ['S', 'M', 'L', 'XL', 'XXL'];
+                let firstAvailableSize = null;
+
+                availableSizes.forEach(sizeKey => {
+                    const qty = currentProductInventory[sizeKey] || 0;
+                    const displaySize = sizeMapping[sizeKey] || sizeKey;
+                    const oosClass = qty === 0 ? ' oos' : '';
+
+                    sizeButtonsHtml += `
+                        <button type="button" 
+                                class="size-btn${oosClass}" 
+                                onclick="handleSizeSelection('${sizeKey}', this)"
+                                ${qty === 0 ? 'disabled' : ''}>
+                            ${displaySize}
+                        </button>
+                    `;
+                    
+                    if (qty > 0 && !firstAvailableSize) {
+                        firstAvailableSize = sizeKey;
+                    }
+                });
+                document.getElementById('qv-size-options').innerHTML = sizeButtonsHtml;
+
+                if (firstAvailableSize) {
+                    const firstButton = document.querySelector(`#qv-size-options button[class*="size-btn"]:not(.oos)`);
+                    if (firstButton) {
+                        handleSizeSelection(firstAvailableSize, firstButton);
+                    }
+                } else {
+                    updateStockDisplay(null); 
+                    document.getElementById('btn-modal-add-to-cart').setAttribute('onclick', `alert('Select an available size.');`);
+                    document.getElementById('btn-buy-now').setAttribute('onclick', `alert('Select an available size.');`);
+                }
+                
+            } catch (error) {
+                document.getElementById('qv-title').textContent = 'Error loading product details.';
+                document.getElementById('qv-description').textContent = 'Please check the console for details.';
+            }
+        }
+
+        function setupWishlistListener(userId) {
+            const wishlistRef = database.ref('users/' + userId + '/wishlist');
+            
+            wishlistRef.on('value', (snapshot) => {
+                userWishlist = snapshot.val() || {};
+                renderWishlistModal(userWishlist);
+                refreshProductGrid(); 
+            });
+        }
+
+        function renderWishlistModal(wishlistData) {
+            const itemKeys = Object.keys(wishlistData);
+            const totalItems = itemKeys.length;
+            
+            wishlistCountDisplay.textContent = totalItems;
+            wishlistTitle.textContent = `Your Wishlist (${totalItems} ${totalItems === 1 ? 'Item' : 'Items'})`;
+            
+            if (totalItems === 0) {
+                wishlistItemsList.innerHTML = '<p>Your wishlist is empty. Start adding products!</p>';
+                return;
+            }
+
+            let wishlistHtml = '';
+            itemKeys.forEach(productId => {
+                const productDetails = allProductsCache[productId];
+                
+                if (productDetails) {
+                    const currentPrice = parseFloat(productDetails.price) || 0;
+                    
+                    wishlistHtml += `
+                        <div class="wishlist-item">
+                            <img src="${productDetails.images[0] || 'https://via.placeholder.com/80x80?text=Product'}" alt="${productDetails.name}" class="wishlist-item-img">
+                            <div class="wishlist-item-details">
+                                <h4>${productDetails.name}</h4>
+                                <p>Price: ₹${currentPrice.toFixed(2)}</p>
+                                <p style="color: #2ecc71;">In Stock</p>
+                            </div>
+                            <div class="wishlist-item-actions">
+                                <button class="btn-add-to-cart" onclick="addToCartFromWishlist('${productId}')">Add to Cart</button>
+                                <button class="remove-btn" onclick="toggleWishlist('${productId}')" style="color: var(--primary-color);">Remove</button>
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+            wishlistItemsList.innerHTML = wishlistHtml;
+        }
+
+        async function toggleWishlist(productId) {
+            const user = auth.currentUser;
+            if (!user) {
+                alert("Please sign in to manage your wishlist.");
+                toggleProfileModal();
+                return;
+            }
+            
+            const userId = user.uid;
+            const wishlistRef = database.ref(`users/${userId}/wishlist/${productId}`);
+            
+            try {
+                const snapshot = await wishlistRef.once('value');
+                
+                if (snapshot.exists()) {
+                    await wishlistRef.remove();
+                } else {
+                    await wishlistRef.set({ addedAt: new Date().toISOString() });
+                }
+            } catch (error) {
+                console.error("Error toggling wishlist:", error);
+                alert("Failed to update wishlist. Please check console.");
+            }
+        }
+        
+        function addToCartFromWishlist(productId) {
+            addToCart(productId, 'M'); 
+            toggleWishlistModal();
+            // REMOVED toggleCartModal();
+        }
+        
+        function setupCartListener(userId) {
+            const cartRef = database.ref('users/' + userId + '/cart');
+            
+            cartRef.on('value', (snapshot) => {
+                const cartData = snapshot.val() || {};
+                renderCartModal(cartData);
+            });
+        }
+        
+        function renderCartModal(cartData) {
+            const itemKeys = Object.keys(cartData);
+            let totalItems = 0;
+            let subtotal = 0;
+            let totalSaved = 0;
+            let cartHtml = '';
+
+            if (itemKeys.length === 0) {
+                cartHtml = '<p>Your cart is empty.</p>';
+            } else {
+                
+                itemKeys.forEach(productId => {
+                    const cartItem = cartData[productId];
+                    const productDetails = allProductsCache[productId];
+                    
+                    if (productDetails) {
+                        const currentPrice = parseFloat(productDetails.price) || 0;
+                        const originalPrice = currentPrice + 500; 
+                        const savedAmount = 500;
+                        
+                        const itemTotal = currentPrice * cartItem.quantity;
+                        
+                        totalItems += cartItem.quantity;
+                        subtotal += itemTotal;
+                        totalSaved += savedAmount * cartItem.quantity;
+                        
+                        cartHtml += `
+                            <div class="cart-item">
+                                <img src="${productDetails.images[0] || 'https://via.placeholder.com/80x80?text=Product'}" alt="${productDetails.name}" class="cart-item-img">
+                                <div class="cart-item-details">
+                                    <h4>${productDetails.name} - ${cartItem.size}</h4>
+                                    <p>Size: ${cartItem.size}</p>
+                                    <p>Price: <span style="text-decoration: line-through; color: #999;">₹${originalPrice.toFixed(2)}</span> ₹${currentPrice.toFixed(2)}</p>
+                                    <button class="remove-btn" onclick="removeItemFromCart('${productId}')">Remove</button>
+                                </div>
+                                <div class="cart-quantity-control">
+                                    <button onclick="updateQuantity('${productId}', -1)">-</button>
+                                    <input type="number" value="${cartItem.quantity}" min="1" max="10" readonly>
+                                    <button onclick="updateQuantity('${productId}', 1)">+</button>
+                                </div>
+                                <div class="cart-item-price">₹${itemTotal.toFixed(2)}</div>
+                            </div>
+                        `;
+                    }
+                });
+            }
+
+            cartCountDisplay.textContent = totalItems;
+            cartTitle.textContent = `Your Shopping Cart (${totalItems} ${totalItems === 1 ? 'Item' : 'Items'})`;
+            summaryTitle.textContent = `Subtotal (${totalItems} ${totalItems === 1 ? 'item' : 'items'})`;
+            summarySubtotal.textContent = subtotal.toFixed(2);
+            summarySaved.textContent = totalSaved.toFixed(2);
+            cartItemsList.innerHTML = cartHtml;
+        }
+
+
+        async function addToCart(productId, selectedSize = 'M') {
+            const user = auth.currentUser;
+            if (!user) {
+                alert("Please sign in to add items to the cart.");
+                toggleQuickViewModal();
+                toggleProfileModal();
+                return;
+            }
+            
+            if (selectedSize === 'M' && quickViewModal.style.display === 'block') {
+                 const activeSizeButton = document.querySelector('#qv-size-options button.active');
+                 if (!activeSizeButton) {
+                     alert("Please select a size first.");
+                     return;
+                 }
+            }
+
+            const userId = user.uid;
+            const cartItemRef = database.ref(`users/${userId}/cart/${productId}`); 
+
+            try {
+                 const snapshot = await cartItemRef.once('value');
+                 const existingItem = snapshot.val();
+                 
+                 let newQuantity = 1;
+                 
+                 if (existingItem && existingItem.size === selectedSize) {
+                     newQuantity = existingItem.quantity + 1;
+                     
+                     // --- STOCK LIMIT CHECK (M Size Limit Example: 3) ---
+                     if (selectedSize === 'M' && newQuantity > 3) {
+                         alert(`Stock Error: Cannot add more than 3 items of Size M.`);
+                         return; // Stop adding to cart
+                     }
+                     // --- END STOCK LIMIT CHECK ---
+
+                     await cartItemRef.update({ quantity: newQuantity });
+                 } else {
+                     // Initial add - check stock limit if applicable
+                      if (selectedSize === 'M' && newQuantity > 3) { 
+                          alert(`Stock Error: Cannot add more than 3 items of Size M.`);
+                          return; 
+                      }
+                      
+                      await cartItemRef.set({
+                         productId: productId,
+                         size: selectedSize, 
+                         quantity: newQuantity,
+                         addedAt: new Date().toISOString()
+                     });
+                 }
+                
+                alert(`Added/Updated Product ID: ${productId} (Size: ${selectedSize}, Qty: ${newQuantity}) in Firebase Cart!`);
+                toggleQuickViewModal(); 
+                // REMOVED toggleCartModal();
+                
+            } catch (error) {
+                console.error("Error adding to cart:", error);
+                alert("Failed to add item to cart. Please check console for details.");
+            }
+        }
+        
+        window.removeItemFromCart = function(productId) {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            if (!confirm(`Are you sure you want to remove this item?`)) {
+                return;
+            }
+
+            database.ref(`users/${user.uid}/cart/${productId}`).remove()
+                .catch(error => {
+                    alert("Failed to remove item.");
+                });
+        }
+
+        window.updateQuantity = function(productId, change) {
+            const user = auth.currentUser;
+            if (!user) return;
+            
+            const itemRef = database.ref(`users/${user.uid}/cart/${productId}`);
+            itemRef.once('value').then(snapshot => {
+                const item = snapshot.val();
+                item.size = item.size || 'M';
+                if (item) {
+                    const newQuantity = item.quantity + change;
+                    
+                    // --- STOCK LIMIT CHECK (M Size Limit Example: 3) ---
+                    if (item.size === 'M' && newQuantity > 3) {
+                        alert(`Stock Error: Cannot exceed 3 items of Size M.`);
+                        return;
+                    }
+                    // --- END STOCK LIMIT CHECK ---
+                    
+                    if (newQuantity > 0) {
+                        itemRef.update({ quantity: newQuantity });
+                    } else if (newQuantity === 0) {
+                        removeItemFromCart(productId);
+                    }
+                }
+            });
+        }
+
+
+        function togglePaymentDetails(selectedMethod) {
+            const upiDetails = document.getElementById('upiDetails');
+            const cardsDetails = document.getElementById('cardsDetails');
+            const upiOption = document.getElementById('upiOption');
+            const cardsOption = document.getElementById('cardsOption');
+
+            upiDetails.classList.add('hidden');
+            cardsDetails.classList.add('hidden');
+            upiOption.classList.remove('selected');
+            cardsOption.classList.remove('selected');
+            
+            if (selectedMethod === 'upi') {
+                upiDetails.classList.remove('hidden');
+                upiOption.classList.add('selected');
+            } else if (selectedMethod === 'cards') {
+                cardsDetails.classList.remove('hidden');
+                cardsOption.classList.add('selected');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            if(document.getElementById('upi-pay')) {
+                togglePaymentDetails('upi');
+            }
+        });
+
+        async function openCheckoutModal(productId, selectedSize) {
+            
+            if (!auth.currentUser) {
+                alert("Please sign in or sign up before proceeding to checkout.");
+                quickViewModal.style.display = 'none';
+                profileModal.style.display = 'block';
+                return;
+            }
+
+            const userId = auth.currentUser.uid;
+            let contactNumber = '';
+            let fullName = '';
+            
+            try {
+                const snapshot = await database.ref('users/' + userId).once('value');
+                const userData = snapshot.val();
+                contactNumber = userData.contact || '';
+                fullName = userData.name || '';
+            } catch (error) {
+            }
+            
+            const name = fullName || '';
+            
+            document.getElementById('checkout-form').reset();
+            document.getElementById('checkout-phone').value = contactNumber;
+            document.getElementById('checkout-name').value = name;
+            
+            document.getElementById('upi-pay').checked = true;
+            togglePaymentDetails('upi');
+            
+            quickViewModal.style.display = 'none';
+            checkoutModal.style.display = 'block';
+        }
+
+        function nextCheckoutStep() {
+            alert("Checkout process submitted! Contact details are pre-filled using Firebase.");
+        }
+
+        function toggleProfileModal() { 
+             profileModal.style.display = profileModal.style.display === 'block' ? 'none' : 'block'; 
+             if (profileModal.style.display === 'block' && !auth.currentUser) {
+                 showForm('signin');
+             }
+        }
+        function toggleQuickViewModal() { quickViewModal.style.display = quickViewModal.style.display === 'block' ? 'none' : 'block'; }
+        function toggleCheckoutModal() { checkoutModal.style.display = checkoutModal.style.display === 'block' ? 'none' : 'block'; }
+        function toggleCartModal() { cartModal.style.display = cartModal.style.display === 'block' ? 'none' : 'block'; } 
+        function toggleWishlistModal() { wishlistModal.style.display = wishlistModal.style.display === 'block' ? 'none' : 'block'; } 
+        
+        window.showForm = function(formType) {
+            const signupContainer = document.querySelector('#profileModal #signupFormContainer');
+            const signinContainer = document.querySelector('#profileModal #signinFormContainer');
+            const signupTab = document.querySelector('#signup-tab');
+            const signinTab = document.querySelector('#signin-tab');
+
+            if (formType === 'signup') {
+                signupContainer.classList.remove('hidden');
+                signinContainer.classList.add('hidden');
+                signupTab.classList.add('active');
+                signinTab.classList.remove('active');
+            } else {
+                signinContainer.classList.remove('hidden');
+                signupContainer.classList.add('hidden');
+                signinTab.classList.add('active');
+                signupTab.classList.remove('active');
+            }
+        };
+
+        async function updateUI(user) {
+            const profileIcon = document.querySelector('#profile-container .fas.fa-user');
+            const userNameDisplay = document.querySelector('#profile-container .user-name-display');
+            const formToggle = document.querySelector('#profileModal .form-toggle');
+            const signupContainer = document.querySelector('#profileModal #signupFormContainer');
+            const signinContainer = document.querySelector('#profileModal #signinFormContainer');
+            const profileViewContainer = document.querySelector('#profileModal #profileViewContainer');
+
+            if (user) {
+                setupCartListener(user.uid);
+                setupWishlistListener(user.uid); 
+                
+                try {
+                    const snapshot = await database.ref('users/' + user.uid).once('value');
+                    const userData = snapshot.val();
+                    
+                    if (userData && userData.role === 'admin') {
+                        window.location.href = 'admin.html';
+                        return; 
+                    } 
+                    
+                    profileIcon.classList.add('hidden');
+                    userNameDisplay.classList.remove('hidden');
+                    userNameDisplay.textContent = user.displayName || user.email.split('@')[0];
+                    
+                    if(formToggle) formToggle.classList.add('hidden');
+                    if(signupContainer) signupContainer.classList.add('hidden');
+                    if(signinContainer) signinContainer.classList.add('hidden');
+                    if(profileViewContainer) profileViewContainer.classList.remove('hidden');
+                    
+                    if (userData) {
+                        document.querySelector('#profile-name-display').textContent = userData.name || 'N/A';
+                        document.querySelector('#profile-email-display').textContent = userData.email || 'N/A';
+                        document.querySelector('#profile-contact-display').textContent = userData.contact && userData.contact.trim() !== '' ? userData.contact : 'Not set';
+                    } else {
+                        document.querySelector('#profile-name-display').textContent = user.displayName || user.email.split('@')[0];
+                        document.querySelector('#profile-email-display').textContent = user.email;
+                        document.querySelector('#profile-contact-display').textContent = 'Not set (Missing RTDB entry)';
+                    }
+                    
+                } catch (error) { console.error("Error:", error); }
+            } else {
+                 database.ref('users/').off('value');
+                 renderCartModal({}); 
+                 renderWishlistModal({}); 
+                 cartCountDisplay.textContent = '0';
+                 wishlistCountDisplay.textContent = '0';
+
+                 profileIcon.classList.remove('hidden');
+                 userNameDisplay.classList.remove('hidden'); 
+                 userNameDisplay.textContent = 'Sign In'; 
+                 if(profileViewContainer) profileViewContainer.classList.add('hidden');
+                 if(formToggle) formToggle.classList.remove('hidden');
+                 showForm('signin'); 
+            }
+        }
+        
+        async function signOutUser() {
+            try {
+                await auth.signOut();
+                toggleProfileModal(); 
+            } catch (error) { alert("Sign Out Failed: " + error.message); }
+        }
+
+        document.querySelector('#signup-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = document.querySelector('#signup-name').value;
+            const email = document.querySelector('#signup-email').value;
+            const password = document.querySelector('#signup-password').value;
+            const rePassword = document.querySelector('#signup-repassword').value;
+            const contact = document.querySelector('#signup-contact').value;
+            if (password !== rePassword) { alert('Passwords do not match!'); return; }
+            try {
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                await user.updateProfile({ displayName: name });
+                await database.ref('users/' + user.uid).set({ name: name, email: email, contact: contact, role: "user" });
+            } catch (error) { alert('Sign Up Failed: ' + error.message); }
+        });
+
+        document.querySelector('#signin-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.querySelector('#signin-email').value;
+            const password = document.querySelector('#signin-password').value;
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+            } catch (error) { alert('Sign In Failed: ' + error.message); }
+        });
+
+        // --- Counter Functionality (FIXED) ---
+        function startCounter(element, target, duration, suffix) {
+            let start = 0;
+            const totalSteps = 100;
+            const increment = target / totalSteps;
+            let currentStep = 0;
+
+            const timer = setInterval(() => {
+                currentStep++;
+                let currentValue = Math.ceil(increment * currentStep);
+
+                if (currentValue >= target) {
+                    currentValue = target;
+                    clearInterval(timer);
+                }
+
+                let displayValue = currentValue.toString();
+
+                if (currentValue === target) {
+                    // Final display value formatting
+                    if (suffix === 'k+') {
+                        displayValue = `${Math.floor(target / 1000)}k+`;
+                    } else if (suffix === '+') {
+                        displayValue = `${target}+`;
+                    }
+                } else if (suffix === 'k+') {
+                    // Intermediate display value formatting for k+
+                    displayValue = `${Math.floor(currentValue / 1000)}k+`;
+                } else if (suffix === '+') {
+                     // Intermediate display value formatting for +
+                     displayValue += '+';
+                }
+
+                element.textContent = displayValue;
+
+                if (currentValue === target) {
+                    clearInterval(timer);
+                }
+            }, duration / totalSteps);
+        }
+
+
+        function initializeCounters() {
+             if (countersInitialized) return;
+             countersInitialized = true;
+             
+             document.querySelectorAll('#about-us .counter-value').forEach(el => {
+                const target = parseInt(el.dataset.target);
+                const suffix = el.dataset.suffix || '';
+                
+                el.textContent = '0';
+                
+                startCounter(el, target, 2000, suffix); 
+             });
+        }
+        
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting && entry.target.id === 'about-us') {
+                    initializeCounters();
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.2 });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('about-us')) {
+                 observer.observe(document.getElementById('about-us'));
+            }
+        });
+
+
+        auth.onAuthStateChanged(updateUI); 
+        
+        window.onload = function() {
+            loadAndDisplayLogo();
+            loadAdBanner();
+            loadCategoryImages(); // <--- Category Image loading added here
+            loadAndRenderAllProducts();
+            
+            // Set initial view to Home page (hides all product sections)
+            showHomePageView();
+        }
+        
+    </script>
+</body>
+</html>
