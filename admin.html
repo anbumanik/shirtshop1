@@ -1,0 +1,1514 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🔒 DUSTED Admin Control Panel</title>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyAH_9T5ACVJpzqRLF3DRFrrNT8XSrplEI4",
+            authDomain: "skcollection-96f9a.firebaseapp.com",
+            databaseURL: "https://skcollection-96f9a-default-rtdb.firebaseio.com",
+            projectId: "skcollection-96f9a",
+            storageBucket: "skcollection-96f9a.firebasestorage.app",
+            messagingSenderId: "52946896548",
+            appId: "1:52946896548:web:d03321527e7fa449b18831",
+            measurementId: "G-9H3FVEHZN8"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth(); 
+        const database = firebase.database(); 
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap');
+        :root {
+            --admin-bg: #1e3f43;
+            --admin-primary: #4ed9c0;
+            --admin-text: #ecf0f1;
+            --table-header: #295156;
+            --table-row-odd: #306066;
+            --table-row-even: #3b747d;
+            --input-bg: #3b747d;
+            --delete-color: #e74c3c; 
+            --sidebar-width: 240px;
+        }
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--admin-bg);
+            color: var(--admin-text);
+        }
+        .dashboard-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* --- Sidebar Styles (UPDATED for Flexbox Alignment) --- */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--table-header);
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.5);
+            padding: 20px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: fixed;
+            height: 100%;
+            z-index: 1000;
+        }
+        .sidebar-header {
+            color: var(--admin-primary);
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 30px;
+            text-align: center;
+            padding: 0 15px;
+        }
+        .sidebar-nav {
+            width: 100%;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+        .nav-section-title {
+            color: #bdc3c7;
+            font-size: 0.9rem;
+            padding: 10px 15px;
+            margin-top: 15px;
+            font-weight: 600;
+            border-bottom: 1px solid #3b747d;
+            text-transform: uppercase;
+        }
+        .sidebar-nav button, .sidebar-nav a {
+            width: 90%;
+            margin: 5px auto;
+            padding: 10px 15px;
+            
+            /* 🔑 NEW: Use Flexbox for alignment */
+            display: flex; 
+            align-items: center; 
+            justify-content: flex-start;
+            
+            border: none;
+            cursor: pointer;
+            background: none;
+            color: var(--admin-text);
+            font-size: 0.9rem;
+            border-radius: 5px;
+            transition: background-color 0.2s, color 0.2s;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .sidebar-nav button:hover, .sidebar-nav a:hover, .sidebar-nav .active {
+            background-color: #3b747d;
+            color: var(--admin-primary);
+        }
+        .sidebar-nav i {
+            /* 🔑 NEW: Fixed width for the icon column ensures all text starts at the same horizontal position */
+            margin-right: 10px;
+            width: 20px; 
+            text-align: center;
+        }
+        /* Ensure specific action buttons also use flex formatting */
+        .sidebar-nav .action-btn {
+            margin: 5px auto !important; 
+            width: 90%;
+            display: flex;
+            justify-content: flex-start; 
+            align-items: center;
+        }
+        
+        .sidebar-footer {
+            margin-top: auto; 
+            width: 100%;
+            padding: 10px 15px;
+            border-top: 1px solid #3b747d;
+        }
+        
+        /* --- Main Content Area --- */
+        .main-content {
+            margin-left: var(--sidebar-width); 
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        .dashboard-container {
+            max-width: 100%; 
+            margin: 0 auto;
+            background: var(--table-header);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--admin-primary);
+            font-size: 2.5rem;
+            margin-bottom: 5px;
+        }
+        .action-btn {
+            background: var(--admin-primary);
+            color: var(--admin-bg);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: background 0.3s;
+            text-decoration: none;
+            margin: 5px 10px;
+            display: inline-block;
+        }
+        .action-btn:hover {
+            background: #39b7a0;
+        }
+        .btn-add-shirt { background-color: #2ecc71; }
+        .btn-add-shirt:hover { background-color: #27ae60; }
+        .btn-add-pants { background-color: #f39c12; }
+        .btn-add-pants:hover { background-color: #e67e22; }
+        .btn-add-tshirt { background-color: #4ed9c0; }
+        .btn-add-tshirt:hover { background-color: #39b7a0; }
+        .btn-manage-ads { background-color: #9b59b6; }
+        .btn-manage-ads:hover { background-color: #8e44ad; }
+        .logout-btn {
+            background: var(--delete-color);
+            color: white;
+            width: 100%;
+            margin: 10px 0;
+        }
+        .logout-btn:hover {
+            background: #c0392b;
+        }
+        .hidden {
+            display: none !important;
+        }
+        
+        /* --- Modal Styles (Unchanged) --- */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 2000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.8); 
+            padding-top: 50px;
+        }
+        .modal-content {
+            background-color: var(--table-header);
+            margin: 0 auto; 
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%; 
+            max-width: 800px; 
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+            position: relative;
+            color: var(--admin-text);
+            text-align: left;
+        }
+        .modal-content.ad-modal {
+             max-width: 600px;
+        }
+        .modal-content h2 {
+            text-align: center;
+            color: var(--admin-primary);
+            border-bottom: 2px solid var(--admin-primary);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 30px;
+            font-weight: bold;
+            position: absolute;
+            top: 10px;
+            right: 20px;
+            line-height: 1;
+            cursor: pointer;
+        }
+        .close-btn:hover {
+            color: var(--admin-text);
+        }
+
+        /* --- Form Styles (Unchanged) --- */
+        .product-form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .product-form-grid .full-width {
+            grid-column: 1 / -1;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        .form-group input, .form-group select, .form-group textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #555;
+            border-radius: 4px;
+            background-color: var(--input-bg);
+            color: var(--admin-text);
+            font-family: inherit;
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+        .delete-btn-form {
+            background-color: var(--delete-color);
+            color: white;
+            font-weight: 600;
+        }
+        .delete-btn-form:hover {
+            background-color: #c0392b;
+        }
+        .btn-delete-product-list {
+            background-color: var(--delete-color);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+        }
+        .inventory-section {
+            grid-column: 1 / -1;
+            padding: 15px;
+            border: 1px dashed var(--admin-primary);
+            border-radius: 8px;
+        }
+        .inventory-section h3 {
+            margin-bottom: 10px;
+            color: var(--admin-primary);
+            font-size: 1.2rem;
+            text-align: center;
+        }
+        .inventory-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+        }
+        .inventory-grid input {
+            text-align: center;
+            padding: 8px;
+        }
+        .inventory-grid label {
+            text-align: center;
+        }
+        #adForm .form-group {
+            margin-bottom: 20px;
+        }
+        #currentAdPreview1, #currentAdPreview2, #currentLogoPreview {
+            max-width: 100%; 
+            height: auto; 
+            border: 1px solid #555; 
+            margin-top: 10px; 
+            display: block;
+        }
+        .ad-preview-container {
+            display: flex;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .ad-preview-item {
+            flex: 1;
+            text-align: center;
+        }
+        .logo-preview-item {
+            flex: 1;
+            text-align: center;
+        }
+
+        /* --- Table Styles (Unchanged) --- */
+        #productTable, #userTable {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+        #productTable th, #productTable td, #userTable th, #userTable td {
+            padding: 10px;
+            border: 1px solid #4a627a;
+            text-align: center;
+        }
+        .total-stock-label {
+            font-weight: bold;
+            color: #2ecc71; 
+        }
+        .product-action-group {
+            display: flex;
+            justify-content: center;
+            gap: 5px;
+        }
+        .user-count {
+            display: block;
+            margin-top: 10px;
+            font-size: 1.2em;
+            font-weight: 600;
+            color: var(--admin-primary);
+        }
+        
+        /* Media Query for smaller screens (Hide sidebar, show toggle button) */
+        @media (max-width: 900px) {
+            .sidebar {
+                width: 0;
+                overflow: hidden;
+                transition: width 0.3s;
+            }
+            .sidebar.open {
+                width: var(--sidebar-width);
+            }
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            .sidebar-toggle {
+                display: block; /* Show the toggle button */
+                position: fixed;
+                top: 0;
+                left: 0;
+                z-index: 1001;
+                background-color: var(--table-header);
+                color: var(--admin-primary);
+                padding: 10px 15px;
+                font-size: 1.2rem;
+                cursor: pointer;
+                border: none;
+                transition: left 0.3s;
+            }
+            .sidebar-toggle.open {
+                 left: var(--sidebar-width);
+            }
+        }
+    </style>
+</head>
+<body>
+    
+    <div id="loadingMessage" class="dashboard-container" style="margin: 50px auto; max-width: 500px;">
+        <h1>Authenticating...</h1>
+        <p>Checking admin user permissions...</p>
+    </div>
+
+    <button id="sidebarToggle" class="sidebar-toggle hidden" onclick="toggleSidebar()">
+        <i class="fas fa-bars"></i>
+    </button>
+
+    <div id="adminContent" class="dashboard-wrapper hidden">
+        
+        <div id="sidebarMenu" class="sidebar">
+            <div class="sidebar-header">
+                SK-ADMIN DASHBOARD
+            </div>
+            
+            <div class="sidebar-nav">
+                <p class="nav-section-title">Storefront Management</p>
+                <a href="index.html" class="action-btn" style="background: none; color: white;">
+                    <i class="fas fa-home"></i>Shop Dashboard
+                </a>
+                <button class="action-btn" style="background: none; color: white;" onclick="openLogoModal()">
+                    <i class="fas fa-image"></i> Update Logo
+                </button> 
+                <button class="action-btn" style="background: none; color: white;" onclick="openAdModal()">
+                    <i class="fas fa-bullhorn"></i> Manage Ads
+                </button>
+                <button class="action-btn" style="background: none; color: white;" onclick="openCategoryImageModal()">
+                    <i class="fas fa-grip-horizontal"></i> Category Images
+                </button>
+                
+                <p class="nav-section-title">Product Inventory</p>
+                <button id="navViewProducts" class="action-btn active" style="background: none; color: white;" onclick="loadAllProductsForAdmin(null); setActiveNavItem('navViewProducts');">
+                    <i class="fas fa-warehouse"></i> View All Products
+                </button>
+                <button class="action-btn btn-add-shirt" onclick="openAddShirtModal('Shirt')">
+                    <i class="fas fa-plus-circle"></i> + Add Shirt
+                </button>
+                <button class="action-btn btn-add-pants" onclick="openAddShirtModal('Pants')">
+                    <i class="fas fa-plus-circle"></i> + Add Pants
+                </button>
+                <button class="action-btn btn-add-tshirt" onclick="openAddShirtModal('T-Shirt')">
+                    <i class="fas fa-plus-circle"></i> + Add T-Shirt
+                </button>
+                <button class="action-btn" style="background-color: #27ae60;" onclick="openAddShirtModal('Shorts')">
+                    <i class="fas fa-plus-circle"></i> + Add Shorts
+                </button>
+                <button class="action-btn" style="background: none; color: white;" onclick="openCategoryManagementModal()">
+                    <i class="fas fa-sitemap"></i> Product Categories
+                </button>
+                
+                <p class="nav-section-title">User Management</p>
+                <button id="navViewUsers" class="action-btn" style="background: none; color: white;" onclick="showUserListView(); setActiveNavItem('navViewUsers');">
+                    <i class="fas fa-users"></i> View All Users
+                </button>
+                
+            </div>
+            
+            <div class="sidebar-footer">
+                <p style="color: #bdc3c7; font-size: 0.8rem; margin-bottom: 10px;">
+                    Logged in as <span id="adminName" style="color: var(--admin-primary); font-weight: bold;">Admin</span>.
+                </p>
+                <a href="#" id="adminLogout" class="action-btn logout-btn">
+                    <i class="fas fa-sign-out-alt"></i> Sign Out
+                </a>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <h1 style="margin-top: 0;">Admin Control Panel</h1>
+            <p style="color: #bdc3c7; margin-bottom: 20px;">
+                Welcome to the SK Collection administration dashboard.
+            </p>
+
+            <section id="userListSection" class="hidden">
+                <h2 style="color: white; margin-bottom: 15px; text-align: center;">Registered User Management</h2>
+                <span id="totalUsersCount" class="user-count"></span>
+                <div id="userTableContainer">
+                    <p style="color: white;">Loading user data...</p>
+                </div>
+            </section>
+
+            <section id="productListSection" class="">
+                <h2 style="color: white; margin-bottom: 15px; text-align: center;">All Products Inventory</h2>
+                
+                <div id="productTableContainer">
+                    <p style="color: white;">Loading product inventory...</p>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <div id="addShirtModal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeAddShirtModal()">&times;</span>
+            <h2 id="modalTitle">Add a Shirt</h2> 
+            
+            <form id="productForm" onsubmit="event.preventDefault(); saveProduct()" data-mode="add">
+                <div class="product-form-grid">
+                    
+                    <div class="form-group full-width">
+                        <label for="productID">Product ID (SKU) **(Automatic)**</label>
+                        <input type="text" id="productID" required readonly style="color: yellow; background-color: #3b526b;">
+                        <small id="skuFormatExample" style="color: #ccc;">Format: SKMMYY-[TypeInitial]XX (e.g., SK1125-S04)</small>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productName">Product Name / Headline</label>
+                        <input type="text" id="productName" required placeholder="e.g., Slim Fit Casual Shirt">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="productCategory">Product Type</label>
+                        <select id="productCategory" required>
+                            <option value="Casual">Casual</option>
+                            <option value="Formal">Formal</option>
+                            <option value="Printed">Printed</option>
+                            <option value="T-Shirt">T-Shirt</option>
+                            <option value="Pants">Pants</option>
+                            <option value="Bottom Wear">Bottom Wear</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="productPrice">Price (INR)</label>
+                        <input type="number" id="productPrice" required min="100" placeholder="e.g., 899">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label>Image URLs (3 URLs Required)</label>
+                        <input type="url" id="imageURL1" required placeholder="Image URL 1 (Main)">
+                        <input type="url" id="imageURL2" required placeholder="Image URL 2 (Detail)">
+                        <input type="url" id="imageURL3" required placeholder="Image URL 3 (Model)">
+                    </div>
+
+                    <div class="form-group full-width">
+                        <label for="productDescription">Product Description</label>
+                        <textarea id="productDescription" required placeholder="Detailed description of the fabric, fit, and style..."></textarea>
+                    </div>
+                    
+                    <div class="inventory-section">
+                        <h3>Inventory Stock by Size</h3>
+                        <div class="inventory-grid">
+                            <div class="form-group">
+                                <label for="stockS">S</label>
+                                <input type="number" id="stockS" value="0" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="stockM">M</label>
+                                <input type="number" id="stockM" value="0" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="stockL">L</label>
+                                <input type="number" id="stockL" value="0" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="stockXL">XL</label>
+                                <input type="number" id="stockXL" value="0" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="stockXXL">XXL</label>
+                                <input type="number" id="stockXXL" value="0" min="0" required>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="action-btn" style="grid-column: 1 / 3;">Save Product</button>
+                    <button type="button" class="action-btn delete-btn-form hidden" onclick="deleteProduct()" style="grid-column: 3 / 4;">Delete Current</button>
+                    
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="adModal" class="modal">
+        <div class="modal-content ad-modal">
+            <span class="close-btn" onclick="closeAdModal()">&times;</span>
+            <h2 id="adModalTitle">Manage Main Ad Banners (2 Slots)</h2> 
+            
+            <form id="adForm" onsubmit="event.preventDefault(); ">
+                
+                <div id="adBannerFields">
+                    <div class="form-group">
+                        <label for="adImageURL1">Banner 1 URL (Main Top Banner)</label>
+                        <input type="url" id="adImageURL1" required placeholder="Enter primary image URL">
+                    </div>
+                     <div class="form-group">
+                        <label for="adImageURL2">Banner 2 URL (In-Content Banner)</label>
+                        <input type="url" id="adImageURL2" required placeholder="Enter secondary image URL">
+                    </div>
+                </div>
+                
+                <div id="logoUrlField" class="hidden">
+                    <div class="form-group">
+                        <label for="logoImageURL">New Logo Image URL (Square image recommended)</label>
+                        <input type="url" id="logoImageURL" required placeholder="Enter new logo image URL">
+                    </div>
+                </div>
+
+                <button type="submit" id="adSubmitBtn" class="action-btn btn-manage-ads" style="width: 100%;">Update Live Banners</button>
+                
+                <div id="adPreviewContainer" class="ad-preview-container">
+                     <div class="ad-preview-item">
+                        <img id="currentAdPreview1" src="" alt="Ad 1 Preview">
+                        <small style="display: block; color: #ccc;">Banner 1 Preview</small>
+                     </div>
+                     <div class="ad-preview-item">
+                        <img id="currentAdPreview2" src="" alt="Ad 2 Preview">
+                        <small style="display: block; color: #ccc;">Banner 2 Preview</small>
+                     </div>
+                </div>
+                
+                <div id="logoPreviewContainer" class="logo-preview-item hidden">
+                    <img id="currentLogoPreview" src="" alt="Logo Preview" style="max-width: 150px; height: auto;">
+                    <small style="display: block; color: #ccc;">Current Logo Preview</small>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div id="categoryImageModal" class="modal">
+        <div class="modal-content ad-modal">
+            <span class="close-btn" onclick="closeCategoryImageModal()">&times;</span>
+            <h2 id="categoryImageModalTitle">Manage Category Images</h2> 
+            
+            <form id="categoryImageForm" onsubmit="event.preventDefault(); saveCategoryImages()">
+                
+                <div class="form-group">
+                    <label for="shirts_url">Shirts Category Image URL</label>
+                    <input type="url" id="shirts_url" required placeholder="Image URL for Shirts Card">
+                </div>
+                <div class="form-group">
+                    <label for="tshirts_url">T-Shirts Category Image URL</label>
+                    <input type="url" id="tshirts_url" required placeholder="Image URL for T-Shirts Card">
+                </div>
+                <div class="form-group">
+                    <label for="pants_url">Pants Category Image URL</label>
+                    <input type="url" id="pants_url" required placeholder="Image URL for Pants Card">
+                </div>
+                <div class="form-group">
+                    <label for="shorts_url">Shorts Category Image URL</label>
+                    <input type="url" id="shorts_url" required placeholder="Image URL for Shorts Card">
+                </div>
+
+                <button type="submit" class="action-btn" style="width: 100%; background-color: #27ae60;">Update Category Images</button>
+            </form>
+            
+            <p style="color: #ccc; margin-top: 15px; text-align: center; font-size: 0.85em;">
+                Images will appear as rectangles (250x180 recommended) on the main page.
+            </p>
+        </div>
+    </div>
+
+    <div id="categoryManagementModal" class="modal">
+        <div class="modal-content ad-modal">
+            <span class="close-btn" onclick="closeCategoryManagementModal()">&times;</span>
+            <h2>Shop Category Management</h2> 
+            
+            <p style="color: #ccc; margin-bottom: 25px; text-align: center;">
+                Use these links to quickly manage products within core categories.
+            </p>
+
+            <div class="product-form-grid" style="grid-template-columns: 1fr 1fr;">
+                <button type="button" class="action-btn btn-add-shirt" 
+                        onclick="loadAllProductsForAdmin('Shirts'); closeCategoryManagementModal();">
+                    Manage All Shirts / Casual
+                </button>
+                <button type="button" class="action-btn btn-add-tshirt"
+                        onclick="loadAllProductsForAdmin('T-Shirt'); closeCategoryManagementModal();">
+                    Manage All T-Shirts
+                </button>
+                <button type="button" class="action-btn btn-add-pants" 
+                        onclick="loadAllProductsForAdmin('Pants'); closeCategoryManagementModal();">
+                    Manage All Pants
+                </button>
+                <button type="button" class="action-btn" style="background-color: #27ae60;"
+                        onclick="loadAllProductsForAdmin('Shorts'); closeCategoryManagementModal();">
+                    Manage All Shorts
+                </button>
+            </div>
+            
+            <div style="margin-top: 30px; padding: 15px; border: 1px dashed var(--admin-primary); border-radius: 8px;">
+                <h3 style="color: var(--admin-primary); font-size: 1.1em; margin-bottom: 10px; text-align: center;">
+                    Database Image Management
+                </h3>
+                <p style="font-size: 0.9em; color: #ccc;">
+                    Image URLs for products are managed within the individual **Edit Product** modal.
+                    Use the **View Products** list to bulk check product images.
+                </p>
+                <button class="action-btn logout-btn" style="width: 100%; margin-top: 15px;" 
+                        onclick="alert('Database Recovery: This typically involves restoring a database backup or reviewing logs. Please contact your hosting provider for manual restoration.');">
+                    Initiate Database Health Check (Simulated Recovery)
+                </button>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        const loadingMessage = document.getElementById('loadingMessage');
+        const adminContent = document.getElementById('adminContent');
+        const adminNameSpan = document.getElementById('adminName');
+        const adminLogoutButton = document.getElementById('adminLogout');
+        const totalUsersCountSpan = document.getElementById('totalUsersCount'); 
+        const userListSection = document.getElementById('userListSection');
+        const productListSection = document.getElementById('productListSection'); 
+        const userTableContainer = document.getElementById('userTableContainer');
+        const productTableContainer = document.getElementById('productTableContainer'); 
+        const addShirtModal = document.getElementById('addShirtModal');
+        const adModal = document.getElementById('adModal'); 
+        const modalTitle = document.getElementById('modalTitle');
+        const skuFormatExample = document.getElementById('skuFormatExample'); 
+        const categoryManagementModal = document.getElementById('categoryManagementModal');
+        const categoryImageModal = document.getElementById('categoryImageModal');
+        
+        // Sidebar elements
+        const sidebarMenu = document.getElementById('sidebarMenu');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+
+        // Elements for the shared modal structure
+        const adModalTitle = document.getElementById('adModalTitle');
+        const adForm = document.getElementById('adForm');
+        const adSubmitBtn = document.getElementById('adSubmitBtn');
+        const adBannerFields = document.getElementById('adBannerFields');
+        const adPreviewContainer = document.getElementById('adPreviewContainer');
+        const logoUrlField = document.getElementById('logoUrlField');
+        const logoPreviewContainer = document.getElementById('logoPreviewContainer');
+        const currentLogoPreview = document.getElementById('currentLogoPreview');
+        const logoImageURLInput = document.getElementById('logoImageURL');
+        
+        // --- NEW Sidebar Functions ---
+        function toggleSidebar() {
+            sidebarMenu.classList.toggle('open');
+            sidebarToggle.classList.toggle('open');
+        }
+        
+        function setActiveNavItem(itemId) {
+            document.querySelectorAll('.sidebar-nav button, .sidebar-nav a').forEach(item => {
+                item.classList.remove('active');
+            });
+            const item = document.getElementById(itemId);
+            if (item) {
+                item.classList.add('active');
+            }
+            // Close sidebar on mobile after selection
+            if (window.innerWidth <= 900) {
+                toggleSidebar();
+            }
+        }
+        
+        // Initialize active state on load
+        document.addEventListener('DOMContentLoaded', () => {
+            if (document.getElementById('navViewProducts')) {
+                document.getElementById('navViewProducts').classList.add('active');
+            }
+        });
+        // --- END NEW Sidebar Functions ---
+
+
+        function hideAllSections() {
+            userListSection.classList.add('hidden');
+            productListSection.classList.add('hidden');
+        }
+
+        function showUserListView() {
+            hideAllSections();
+            productListSection.classList.add('hidden');
+            userListSection.classList.remove('hidden');
+            loadAllUsers();
+        }
+
+        function showProductListView() {
+            hideAllSections();
+            userListSection.classList.add('hidden');
+            productListSection.classList.remove('hidden');
+            loadAllProductsForAdmin(null); 
+        }
+
+        function closeAddShirtModal() {
+            addShirtModal.style.display = 'none';
+        }
+        function closeAdModal() { 
+            adModal.style.display = 'none';
+        }
+        
+        function openCategoryManagementModal() {
+            categoryManagementModal.style.display = 'block';
+        }
+
+        function closeCategoryManagementModal() { 
+            categoryManagementModal.style.display = 'none';
+        }
+        
+        // NEW Category Image Functions
+        function closeCategoryImageModal() {
+            categoryImageModal.style.display = 'none';
+        }
+
+        async function openCategoryImageModal() {
+            categoryImageModal.style.display = 'block';
+
+            try {
+                // Fetch current URLs from Firebase
+                const snapshot = await database.ref('config/category_images').once('value');
+                const urls = snapshot.val() || {};
+                
+                // Populate the form fields
+                document.getElementById('shirts_url').value = urls.shirts_url || '';
+                document.getElementById('tshirts_url').value = urls.tshirts_url || '';
+                document.getElementById('pants_url').value = urls.pants_url || '';
+                document.getElementById('shorts_url').value = urls.shorts_url || '';
+
+            } catch (error) {
+                console.error("Error loading category image URLs:", error);
+                alert("Failed to load current category image URLs.");
+            }
+        }
+        
+        window.saveCategoryImages = function() {
+            const data = {
+                shirts_url: document.getElementById('shirts_url').value.trim(),
+                tshirts_url: document.getElementById('tshirts_url').value.trim(),
+                pants_url: document.getElementById('pants_url').value.trim(),
+                shorts_url: document.getElementById('shorts_url').value.trim(),
+            };
+
+            // Save the data to Firebase Realtime Database
+            database.ref('config/category_images').set(data)
+                .then(() => {
+                    alert("Category Images updated successfully! Refresh the main page to see changes.");
+                    closeCategoryImageModal();
+                })
+                .catch(error => {
+                    alert("Error saving category images: " + error.message);
+                    console.error("Firebase Category Image Save Error:", error);
+                });
+        };
+        // END NEW Category Image Functions
+
+        function updateSkuFormatExample(typeInitial) {
+             let exampleSku;
+             if (typeInitial === 'P') {
+                exampleSku = 'SK1125-P04 (Pants)';
+             } else if (typeInitial === 'T') {
+                exampleSku = 'SK1125-T04 (T-Shirt)';
+             } else if (typeInitial === 'ST') {
+                exampleSku = 'SK1125-ST04 (Shorts)';
+             } else {
+                exampleSku = 'SK1125-S04 (Shirt/Casual)';
+             }
+             skuFormatExample.textContent = `Format: SKMMYY-[TypeInitial]XX (e.g., ${exampleSku})`;
+        }
+
+
+        async function openAddShirtModal(productType = 'Shirt') {
+            document.getElementById('productForm').reset();
+            document.getElementById('productForm').dataset.mode = 'add'; 
+
+            modalTitle.textContent = `Add a ${productType}`;
+            document.querySelector('.delete-btn-form').classList.add('hidden');
+            document.querySelector('.action-btn[type="submit"]').textContent = 'Save Product';
+
+            const categorySelect = document.getElementById('productCategory');
+            let typeInitial; 
+
+            if (productType === 'Pants') {
+                categorySelect.value = 'Pants';
+                typeInitial = 'P';
+            } else if (productType === 'T-Shirt') {
+                categorySelect.value = 'T-Shirt';
+                typeInitial = 'T';
+            } else if (productType === 'Shorts') {
+                categorySelect.value = 'Bottom Wear'; 
+                typeInitial = 'ST'; 
+            } else {
+                categorySelect.value = 'Casual';
+                typeInitial = 'S'; 
+            }
+            
+            await generateAndSetNewSKU(typeInitial); 
+            updateSkuFormatExample(typeInitial); 
+
+            addShirtModal.style.display = 'block';
+        }
+        
+        async function openEditProductModal(productId) {
+            document.getElementById('productForm').reset();
+            document.getElementById('productForm').dataset.mode = 'edit'; 
+
+            document.querySelector('.delete-btn-form').classList.remove('hidden');
+            document.querySelector('.action-btn[type="submit"]').textContent = 'Update Product';
+
+
+            modalTitle.textContent = 'Edit Product';
+            addShirtModal.style.display = 'block'; 
+
+            try {
+                const snapshot = await database.ref('products/' + productId).once('value');
+                const product = snapshot.val();
+
+                if (!product) {
+                    alert("Product not found for editing.");
+                    closeAddShirtModal();
+                    return;
+                }
+
+                document.getElementById('productID').value = product.id;
+                document.getElementById('productName').value = product.name;
+                document.getElementById('productCategory').value = product.category;
+                document.getElementById('productPrice').value = parseFloat(product.price);
+                document.getElementById('productDescription').value = product.description;
+
+                if (product.images && product.images.length === 3) {
+                    document.getElementById('imageURL1').value = product.images[0];
+                    document.getElementById('imageURL2').value = product.images[1];
+                    document.getElementById('imageURL3').value = product.images[2];
+                } else {
+                    document.getElementById('imageURL1').value = '';
+                    document.getElementById('imageURL2').value = '';
+                    document.getElementById('imageURL3').value = '';
+                }
+
+                const inventory = product.inventory || {};
+                document.getElementById('stockS').value = inventory.S || 0;
+                document.getElementById('stockM').value = inventory.M || 0;
+                document.getElementById('stockL').value = inventory.L || 0;
+                document.getElementById('stockXL').value = inventory.XL || 0;
+                document.getElementById('stockXXL').value = inventory.XXL || 0;
+                
+                let typeInitial = 'S';
+                const category = product.category || 'Casual';
+                if (category === 'Pants') {
+                    typeInitial = 'P';
+                } else if (category === 'T-Shirt') {
+                    typeInitial = 'T';
+                } else if (category === 'Bottom Wear' && product.name.toLowerCase().includes('short')) {
+                    typeInitial = 'ST';
+                }
+                updateSkuFormatExample(typeInitial);
+
+
+            } catch (error) {
+                console.error("Error opening edit modal:", error);
+                alert("Failed to load product for editing: " + error.message);
+                closeAddShirtModal();
+            }
+        }
+
+
+        async function openAdModal() { 
+            // Configure modal for Ad Banners
+            adModalTitle.textContent = 'Manage Main Ad Banners (2 Slots)';
+            
+            // Set up form submission handler for banners
+            adForm.onsubmit = (e) => { e.preventDefault(); saveAdBanner(); };
+            adSubmitBtn.textContent = 'Update Live Banners';
+            
+            // Show ad fields, hide logo fields
+            adBannerFields.classList.remove('hidden');
+            adPreviewContainer.classList.remove('hidden');
+            logoUrlField.classList.add('hidden');
+            logoPreviewContainer.classList.add('hidden');
+
+
+            const adRef = database.ref('config/ads');
+            const snapshot = await adRef.once('value');
+            const ads = snapshot.val() || {};
+            
+            document.getElementById('adImageURL1').value = ads.ad1_url || '';
+            document.getElementById('adImageURL2').value = ads.ad2_url || '';
+
+            document.getElementById('currentAdPreview1').src = ads.ad1_url || 'https://via.placeholder.com/250x150?text=Banner+1';
+            document.getElementById('currentAdPreview2').src = ads.ad2_url || 'https://via.placeholder.com/250x150?text=Banner+2';
+            
+            adModal.style.display = 'block';
+        }
+        
+        // NEW FUNCTION for Logo Update (FIXED)
+        async function openLogoModal() {
+            // Configure modal for Logo URL
+            adModalTitle.textContent = 'Update Store Logo';
+            
+            // Set up form submission handler for logo
+            adForm.onsubmit = (e) => { e.preventDefault(); saveLogoUrl(); };
+            adSubmitBtn.textContent = 'Update Logo';
+            
+            // Hide ad fields, show logo fields
+            adBannerFields.classList.add('hidden');
+            adPreviewContainer.classList.add('hidden');
+            logoUrlField.classList.remove('hidden');
+            logoPreviewContainer.classList.remove('hidden');
+            
+            const logoRef = database.ref('config/logo_url');
+            const snapshot = await logoRef.once('value');
+            const logoUrl = snapshot.val() || '';
+            
+            // Populate and preview fields
+            logoImageURLInput.value = logoUrl;
+            currentLogoPreview.src = logoUrl || 'https://i.postimg.cc/Jhj0FBjr/Screenshot-2025-11-20-195519.png'; // Use provided URL as default/preview
+            
+            adModal.style.display = 'block';
+        }
+
+
+        window.saveAdBanner = function() {
+            const url1 = document.getElementById('adImageURL1').value.trim();
+            const url2 = document.getElementById('adImageURL2').value.trim();
+
+            if (!url1 || !url2) {
+                alert("Please enter both Ad Banner URLs.");
+                return;
+            }
+
+            database.ref('config/ads').set({
+                ad1_url: url1,
+                ad2_url: url2
+            })
+            .then(() => {
+                alert("Ad Banners updated successfully! Changes visible on the main page.");
+                closeAdModal();
+            })
+            .catch(error => {
+                alert("Error saving banners: " + error.message);
+                console.error("Firebase Ad Save Error:", error);
+            });
+        };
+        
+        // FUNCTION to save Logo URL 
+        window.saveLogoUrl = function() {
+            const url = logoImageURLInput.value.trim();
+
+            if (!url) {
+                alert("Please enter the Logo Image URL.");
+                return;
+            }
+
+            // Saves the URL to the Firebase Realtime Database at 'config/logo_url'
+            database.ref('config/logo_url').set(url)
+            .then(() => {
+                alert("Logo URL updated successfully!");
+                closeAdModal();
+            })
+            .catch(error => {
+                alert("Error saving Logo URL: " + error.message);
+                console.error("Firebase Logo Save Error:", error);
+            });
+        };
+
+
+        async function generateAndSetNewSKU(typeInitial) {
+            const now = new Date();
+            const month = (now.getMonth() + 1).toString().padStart(2, '0');
+            const year = now.getFullYear().toString().slice(-2);
+            const datePrefix = `SK${month}${year}-${typeInitial}`; 
+            
+            // Fixed SKU search range
+            const searchStart = `${datePrefix}00`; 
+            const searchEnd = `${datePrefix}99\uf8ff`; 
+
+            try {
+                // Fetch the last SKU that matches the current prefix
+                const snapshot = await database.ref('products')
+                    .orderByKey()
+                    .startAt(searchStart)
+                    .endAt(searchEnd) 
+                    .limitToLast(1)
+                    .once('value');
+                
+                let sequentialNumber = 0;
+                const products = snapshot.val();
+                
+                if (products) {
+                    const latestID = Object.keys(products)[0];
+                    if (latestID && latestID.startsWith(datePrefix)) {
+                        // Extract the sequential number part (last two digits)
+                        const numberPart = latestID.slice(-2); 
+                        const parsedNumber = parseInt(numberPart, 10);
+                        
+                        if (!isNaN(parsedNumber)) {
+                            sequentialNumber = parsedNumber;
+                        }
+                    }
+                }
+                
+                const nextSequential = (sequentialNumber + 1).toString().padStart(2, '0');
+                const newSKU = `${datePrefix}${nextSequential}`;
+                
+                document.getElementById('productID').value = newSKU;
+            } catch (error) {
+                console.error("Error generating SKU. Using default SK-01.", error);
+                document.getElementById('productID').value = `${datePrefix}01`;
+            }
+        }
+
+        window.saveProduct = function() {
+            const id = document.getElementById('productID').value.trim(); 
+            const formMode = document.getElementById('productForm').dataset.mode;
+            const name = document.getElementById('productName').value.trim();
+            const category = document.getElementById('productCategory').value;
+            const price = parseFloat(document.getElementById('productPrice').value);
+            const description = document.getElementById('productDescription').value.trim();
+            
+            const images = [
+                document.getElementById('imageURL1').value.trim(),
+                document.getElementById('imageURL2').value.trim(),
+                document.getElementById('imageURL3').value.trim()
+            ];
+
+            const inventory = {
+                S: parseInt(document.getElementById('stockS').value) || 0,
+                M: parseInt(document.getElementById('stockM').value) || 0,
+                L: parseInt(document.getElementById('stockL').value) || 0,
+                XL: parseInt(document.getElementById('stockXL').value) || 0,
+                XXL: parseInt(document.getElementById('stockXXL').value) || 0,
+            };
+            
+            const totalStock = Object.values(inventory).reduce((sum, qty) => sum + qty, 0);
+
+
+            if (!id || !name || !category || isNaN(price) || !description || images.some(url => !url)) {
+                alert("Please fill in all fields and ensure prices/stock numbers are valid.");
+                return;
+            }
+
+            const productData = {
+                id,
+                name,
+                category,
+                price: price.toFixed(2), 
+                description,
+                images,
+                inventory, 
+                stock: totalStock, 
+                created_at: formMode === 'add' ? new Date().toISOString() : undefined,
+                published: true,
+            };
+
+            const operation = formMode === 'add' ? 
+                database.ref('products/' + id).set(productData) : 
+                database.ref('products/' + id).update(productData);
+
+
+            operation
+                .then(() => {
+                    alert(`Product ${id} (${name}) ${formMode === 'add' ? 'saved' : 'updated'} successfully! Total Stock: ${totalStock}`);
+                    closeAddShirtModal();
+                    if (!productListSection.classList.contains('hidden')) {
+                         loadAllProductsForAdmin(null); // Reload all products after saving
+                    }
+                })
+                .catch(error => {
+                    alert("Error saving product: " + error.message);
+                    console.error("Firebase Save Error:", error);
+                });
+        };
+
+        window.deleteProduct = function() {
+            const id = document.getElementById('productID').value.trim();
+            if (!id) {
+                alert("Product ID is empty. Cannot delete.");
+                return;
+            }
+
+            if (!confirm(`WARNING: Are you sure you want to delete Product ID: ${id}? This cannot be undone.`)) {
+                return;
+            }
+
+            database.ref('products/' + id).remove()
+                .then(() => {
+                    alert(`Product ${id} deleted successfully.`);
+                    document.getElementById('productForm').reset();
+                    closeAddShirtModal();
+                    if (!productListSection.classList.contains('hidden')) {
+                         loadAllProductsForAdmin(null); // Reload all products after deleting
+                    }
+                })
+                .catch(error => {
+                    alert("Error deleting product: " + error.message);
+                    console.error("Firebase Delete Error:", error);
+                });
+        };
+        
+        // --- FILTERING FUNCTION ---
+        window.filterProductsByCategory = function(selectedCategory) {
+            const tableBody = document.querySelector('#productTable tbody');
+            if (!tableBody) {
+                return;
+            }
+            
+            const rows = tableBody.querySelectorAll('tr');
+            let filteredCount = 0;
+
+            rows.forEach(row => {
+                // Name is the 3rd column, Category is the 4th column.
+                const rowCategory = row.getAttribute('data-category').toLowerCase().trim();
+                const productName = row.querySelector('td:nth-child(3)').textContent.toLowerCase();
+                
+                let isMatch = false;
+
+                if (selectedCategory === 'All' || selectedCategory === null) {
+                    isMatch = true;
+                } else if (selectedCategory === 'Shirts') {
+                    if (rowCategory === 'casual' || rowCategory === 'formal' || rowCategory === 'printed') {
+                        isMatch = true;
+                    }
+                } else if (selectedCategory === 'T-Shirt') {
+                    if (rowCategory === 't-shirt') {
+                        isMatch = true;
+                    }
+                } else if (selectedCategory === 'Pants') {
+                    if (rowCategory === 'pants') {
+                        isMatch = true;
+                    }
+                } else if (selectedCategory === 'Shorts') {
+                    // Check if it's 'bottom wear' AND the product name includes 'short', or if the category is explicitly 'shorts'
+                    if ((rowCategory.includes('bottom wear') && productName.includes('short')) || rowCategory === 'shorts') {
+                        isMatch = true;
+                    }
+                }
+
+                if (isMatch) {
+                    row.style.display = '';
+                    filteredCount++;
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+
+            const viewAllFilterBtn = document.getElementById('viewAllFilterBtn');
+            if (selectedCategory !== 'All' && selectedCategory !== null) {
+                viewAllFilterBtn.classList.remove('hidden');
+                viewAllFilterBtn.textContent = `Showing ${selectedCategory} (${filteredCount}) - Click to View All`;
+            } else {
+                viewAllFilterBtn.classList.add('hidden');
+            }
+            
+            // Scroll to the product table after filtering
+            document.getElementById('productTableContainer').scrollIntoView();
+        };
+
+        // --- MODIFIED LOAD FUNCTION TO ACCEPT FILTER ARGUMENT AND DISPLAY IMAGE ---
+        window.loadAllProductsForAdmin = function(categoryFilter) {
+            
+            hideAllSections();
+            productListSection.classList.remove('hidden');
+
+            productTableContainer.innerHTML = '<p style="color: white;">Fetching product inventory...</p>';
+
+            database.ref('products').once('value')
+                .then(snapshot => {
+                    const productsData = snapshot.val();
+                    let productsArray = [];
+
+                    if (productsData) {
+                        productsArray = Object.keys(productsData).map(key => ({
+                            key: key,
+                            ...productsData[key]
+                        }));
+                    }
+                    
+                    if (productsArray.length === 0) {
+                        productTableContainer.innerHTML = '<p style="color:yellow;">No products found in the database.</p>';
+                        return;
+                    }
+
+                    let clearFilterButton = `
+                        <button id="viewAllFilterBtn" class="action-btn hidden" style="margin-bottom: 15px; background-color: #f1c40f;" 
+                                onclick="loadAllProductsForAdmin('All');">
+                            View All Products
+                        </button>
+                    `;
+                    
+                    let tableHTML = `
+                        <h3 style="color: white; margin-bottom: 15px;">Total Products: ${productsArray.length}</h3>
+                        ${clearFilterButton}
+                        <table id="productTable">
+                            <thead>
+                                <tr>
+                                    <th>SKU</th>
+                                    <th>Image</th> <th>Name</th>
+                                    <th>Category</th>
+                                    <th>Price (₹)</th>
+                                    <th>Total Stock</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    
+                    productsArray.forEach((product) => {
+                        const totalStock = product.stock || 0;
+                        const rowCategory = (product.category || 'N/A').trim();
+                        
+                        const imageUrl = (product.images && product.images.length > 0) ? product.images[0] : 'https://via.placeholder.com/50x50?text=No+Image';
+                        
+                        tableHTML += `
+                            <tr data-category="${rowCategory}">
+                                <td>${product.id}</td>
+                                <td><img src="${imageUrl}" alt="${product.name}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 4px;"></td> <td>${product.name}</td>
+                                <td>${rowCategory}</td>
+                                <td>${product.price}</td>
+                                <td><span class="total-stock-label">${totalStock}</span></td>
+                                <td>
+                                    <div class="product-action-group">
+                                        <button class="action-btn" style="background: #3c9ee7;"
+                                            onclick="openEditProductModal('${product.id}')">Edit</button>
+                                        <button class="action-btn btn-delete-product-list" 
+                                                onclick="deleteProductFromList('${product.id}')">Delete</button>
+                                    </div>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    tableHTML += `</tbody></table>`;
+                    productTableContainer.innerHTML = tableHTML;
+                    
+                    if (categoryFilter) {
+                         filterProductsByCategory(categoryFilter);
+                    } else {
+                         document.getElementById('productTableContainer').scrollIntoView();
+                    }
+
+
+                })
+                .catch(error => {
+                    console.error("Error loading product data:", error);
+                    productTableContainer.innerHTML = '<p style="color:red;">Failed to load data. Check database rules.</p>';
+                });
+        }
+        
+        window.deleteProductFromList = function(id) {
+            if (!confirm(`CONFIRM: Are you sure you want to DELETE Product SKU: ${id}?`)) {
+                return;
+            }
+
+            database.ref('products/' + id).remove()
+                .then(() => {
+                    alert(`Product ${id} deleted successfully.`);
+                    loadAllProductsForAdmin(null); 
+                })
+                .catch(error => {
+                    alert("Failed to delete product: " + error.message);
+                    console.error("Firebase Delete Error:", error);
+                });
+        };
+        
+        window.loadAllUsers = function() {
+            userTableContainer.innerHTML = '<p style="color: white;">Fetching user data from Firebase...</p>';
+            totalUsersCountSpan.textContent = 'Loading...';
+
+            database.ref('users').once('value')
+                .then(snapshot => {
+                    const usersData = snapshot.val();
+                    let usersArray = [];
+
+                    if (usersData) {
+                        usersArray = Object.keys(usersData).map(key => ({
+                            uid: key,
+                            ...usersData[key]
+                        }));
+                    }
+                    
+                    totalUsersCountSpan.textContent = `Total Users: ${usersArray.length}`;
+
+                    if (usersArray.length === 0) {
+                        userTableContainer.innerHTML = '<p style="color:yellow;">No user data found in the database.</p>';
+                        return;
+                    }
+
+                    let tableHTML = `
+                        <table id="userTable">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Full Name</th>
+                                    <th>Email</th>
+                                    <th>Current Role</th>
+                                    <th>Manage Role</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                    `;
+                    
+                    usersArray.forEach((user, index) => {
+                        const fullName = user.name || 'N/A'; 
+                        const currentRole = user.role || 'user';
+                        const roleClass = currentRole === 'admin' ? 'role-admin' : 'role-user';
+                        
+                        tableHTML += `
+                            <tr>
+                                <td>${index + 1}</td>
+                                <td>${fullName}</td>
+                                <td>${user.email || 'N/A'}</td>
+                                <td><span class="${roleClass}">${currentRole.toUpperCase()}</span></td>
+                                <td>
+                                    <select class="role-select" 
+                                            data-original-role="${currentRole}"
+                                            onchange="changeUserRole(this, '${user.uid}')">
+                                        <option value="user" ${currentRole === 'user' ? 'selected' : ''}>User</option>
+                                        <option value="admin" ${currentRole === 'admin' ? 'selected' : ''}>Admin</option>
+                                    </select>
+                                </td>
+                            </tr>
+                        `;
+                    });
+
+                    tableHTML += `</tbody></table>`;
+                    userTableContainer.innerHTML = tableHTML;
+
+                })
+                .catch(error => {
+                    console.error("Error loading user data:", error);
+                    userTableContainer.innerHTML = '<p style="color:red;">Failed to load data. Check database rules.</p>';
+                    totalUsersCountSpan.textContent = `Total Users: Error`;
+                });
+        }
+        
+        window.changeUserRole = function(selectElement, uid) {
+            const newRole = selectElement.value;
+            const currentAuthUID = auth.currentUser ? auth.currentUser.uid : null;
+            const originalRole = selectElement.getAttribute('data-original-role');
+
+            if (uid === currentAuthUID && newRole !== 'admin') {
+                alert("ERROR: You cannot remove the admin role from your own account while logged in!");
+                selectElement.value = originalRole;
+                return;
+            }
+            
+            if (!confirm(`Are you sure you want to change user ${uid}'s role to ${newRole.toUpperCase()}?`)) {
+                selectElement.value = originalRole;
+                return;
+            }
+
+            database.ref('users/' + uid).update({
+                role: newRole
+            })
+            .then(() => {
+                alert(`Role for user successfully changed to ${newRole}!`);
+                selectElement.setAttribute('data-original-role', newRole);
+                loadAllUsers(); 
+            })
+            .catch(error => {
+                alert("Failed to update role. Check database rules and network connection.");
+                selectElement.value = originalRole;
+            });
+        };
+        
+        function checkAdminAccess() {
+            const user = auth.currentUser;
+
+            if (!user) {
+                alert("Access Denied: Please sign in.");
+                window.location.href = 'index.html';
+                return;
+            }
+
+            database.ref('users/' + user.uid).once('value')
+                .then(snapshot => {
+                    const userData = snapshot.val();
+                    const userRole = userData ? userData.role : 'user';
+                    const userName = userData ? userData.name : user.email.split('@')[0]; 
+                    
+                    if (userRole === 'admin') {
+                        adminNameSpan.textContent = userName;
+                        loadingMessage.classList.add('hidden');
+                        adminContent.classList.remove('hidden');
+                        
+                        // Show toggle button if on a small screen
+                        if (window.innerWidth <= 900) {
+                            sidebarToggle.classList.remove('hidden');
+                        }
+                        
+                        loadAllProductsForAdmin(null); 
+                    } else {
+                        alert(`Access Denied: Your role (${userRole}) is not authorized.`);
+                        window.location.href = 'index.html';
+                    }
+                })
+                .catch(error => {
+                    console.error("Error fetching role:", error);
+                    alert("Authentication Error: Could not verify user data.");
+                    window.location.href = 'index.html';
+                });
+        }
+        
+        adminLogoutButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            auth.signOut().then(() => {
+                window.location.href = 'index.html';
+            }).catch((error) => {
+                console.error("Logout failed:", error);
+                alert("Logout failed.");
+            });
+        });
+
+        auth.onAuthStateChanged(user => {
+            if (user) {
+                checkAdminAccess();
+            } else {
+                checkAdminAccess(); 
+            }
+        });
+
+    </script>
+
+</body>
+</html>
